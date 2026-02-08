@@ -1,0 +1,27 @@
+
+# Created by Gemini
+
+# Gradle files
+.gradle/
+build/
+gradle-8.4-bin.zip
+msimobsen-music.com.tar.gz
+
+# Android Studio
+.idea/
+*.iml
+local.properties
+
+# Keystore files
+*.jks
+*.keystore
+
+# APKs and bundles
+*.apk
+*.apks
+*.aab
+
+# Other
+.DS_Store
+captures/
+.externalNativeBuild
