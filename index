@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Msimobsen Music Location</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+  </head>
+  <body>
+    <div id="map" style="height: 500px; width: 100%;"></div>
+    <script>
+      function initMap() {
+        const loc = { lat: -34.397, lng: 150.644 }; // Change to your marker location
+        const map = new google.maps.Map(document.getElementById("map"), { zoom: 8, center: loc });
+        new google.maps.Marker({ position: loc, map: map });
+      }
+      initMap();
+    </script>
+  </body>
+</html>
