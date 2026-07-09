@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Users, Eye, MousePointerClick, DollarSign, Activity, TrendingUp } from 'lucide-react';
+import { Users, Eye, MousePointerClick, DollarSign, Activity, TrendingUp, ShoppingCart, ArrowRight } from 'lucide-react';
 import { AdUnit } from '../components/AdUnit.tsx';
+import { useSimulatedTime, getGlobalSimulatedTime } from '../utils/useSimulatedTime.ts';
 
-// Generate initial mock data for the chart
+// Generate initial mock data for the chart using simulated time
 const generateInitialData = () => {
   const data = [];
-  const now = new Date();
+  const now = getGlobalSimulatedTime();
   let currentUsers = 1200;
   for (let i = 20; i >= 0; i--) {
-    const time = new Date(now.getTime() - i * 3000);
+    const time = new Date(now - i * 3000);
     currentUsers = Math.max(500, currentUsers + (Math.floor(Math.random() * 100) - 40));
     data.push({
-      time: time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      time: time.toLocaleTimeString('en-US', { timeZone: 'America/Toronto', hour: '2-digit', minute: '2-digit', second: '2-digit' }),
       users: currentUsers,
     });
   }
@@ -20,11 +21,13 @@ const generateInitialData = () => {
 };
 
 export const Analytics: React.FC = () => {
+  const { formattedTime, formattedDate } = useSimulatedTime();
   const [trafficData, setTrafficData] = useState(generateInitialData());
   const [activeUsers, setActiveUsers] = useState(trafficData[trafficData.length - 1].users);
   const [pageViews, setPageViews] = useState(145892);
   const [adImpressions, setAdImpressions] = useState(312050);
   const [revenue, setRevenue] = useState(425.50);
+  const [web3Sales, setWeb3Sales] = useState(142); // Mock initial sales
 
   // Simulate live data updates
   useEffect(() => {
@@ -35,9 +38,9 @@ export const Analytics: React.FC = () => {
         const nextUsers = Math.max(800, prev + change);
         
         setTrafficData((currentData) => {
-          const now = new Date();
+          const now = new Date(getGlobalSimulatedTime());
           const newDataPoint = {
-            time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+            time: now.toLocaleTimeString('en-US', { timeZone: 'America/Toronto', hour: '2-digit', minute: '2-digit', second: '2-digit' }),
             users: nextUsers,
           };
           // Keep the last 20 data points
@@ -48,6 +51,11 @@ export const Analytics: React.FC = () => {
         setPageViews(pv => pv + Math.floor(Math.random() * 5));
         setAdImpressions(ai => ai + Math.floor(Math.random() * 12));
         setRevenue(rev => rev + (Math.random() * 0.05));
+        
+        // Simulate occasional Web3 sale conversion
+        if (Math.random() > 0.92) {
+          setWeb3Sales(sales => sales + 1);
+        }
 
         return nextUsers;
       });
@@ -80,7 +88,7 @@ export const Analytics: React.FC = () => {
       bg: 'bg-brand-400/10' 
     },
     { 
-      title: 'Est. Revenue', 
+      title: 'Est. Ad Revenue', 
       value: `$${revenue.toFixed(2)}`, 
       icon: DollarSign, 
       color: 'text-yellow-400', 
@@ -93,18 +101,59 @@ export const Analytics: React.FC = () => {
       <div className="flex items-center justify-between mb-8">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-4xl font-extrabold text-white">Live Traffic</h1>
+            <h1 className="text-4xl font-extrabold text-white">Live Traffic & Conversions</h1>
             <span className="flex h-3 w-3 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
             </span>
           </div>
-          <p className="text-gray-400">Monitor real-time user engagement and ad performance.</p>
+          <p className="text-gray-400">Monitor real-time user engagement, ad performance, and Web3 sales as of {formattedDate}.</p>
         </div>
         <button className="bg-dark-200 hover:bg-dark-100 text-white px-4 py-2 rounded-lg border border-dark-100 flex items-center gap-2 transition-colors">
           <Activity size={18} />
           Detailed Report
         </button>
+      </div>
+
+      {/* Web3 Conversion Funnel */}
+      <div className="bg-gradient-to-br from-brand-900/40 to-dark-200 rounded-2xl p-6 border border-brand-500/30 mb-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
+              <ShoppingCart className="text-brand-400" />
+              Web3 Network Access Conversions
+            </h2>
+            <p className="text-gray-400 max-w-2xl">
+              Track real-time conversion of active users purchasing the MSIMobsen Music Network Access Web3 pass for C$18.00.
+            </p>
+          </div>
+          <a 
+            href="https://msimobsenmusic.com/shop/ols/products/msimobsenmusicnetworkaccessweb3" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="bg-brand-600 hover:bg-brand-500 text-white px-6 py-3 rounded-xl font-bold transition-colors whitespace-nowrap flex items-center gap-2 shadow-lg shadow-brand-900/50"
+          >
+            View Product Page <ArrowRight size={18} />
+          </a>
+        </div>
+
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-dark-300/50 rounded-xl p-4 border border-dark-100 text-center">
+            <p className="text-gray-400 text-sm mb-1">Active Users (Potential)</p>
+            <p className="text-3xl font-bold text-white">{activeUsers.toLocaleString()}</p>
+          </div>
+          <div className="bg-dark-300/50 rounded-xl p-4 border border-dark-100 text-center relative">
+            <div className="hidden md:block absolute -left-3 top-1/2 -translate-y-1/2 text-gray-500"><ArrowRight /></div>
+            <p className="text-gray-400 text-sm mb-1">Live Conversion Rate</p>
+            <p className="text-3xl font-bold text-brand-400">{(web3Sales / (activeUsers + web3Sales) * 100).toFixed(2)}%</p>
+          </div>
+          <div className="bg-brand-500/10 rounded-xl p-4 border border-brand-500/30 text-center relative">
+            <div className="hidden md:block absolute -left-3 top-1/2 -translate-y-1/2 text-gray-500"><ArrowRight /></div>
+            <p className="text-brand-200 text-sm mb-1">Web3 Sales (C$18.00)</p>
+            <p className="text-3xl font-bold text-white">{web3Sales}</p>
+            <p className="text-xs text-emerald-400 mt-1 font-medium">Est. Revenue: C${(web3Sales * 18).toFixed(2)}</p>
+          </div>
+        </div>
       </div>
 
       {/* Stats Grid */}
