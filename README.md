@@ -1,51 +1,53 @@
-# Msimobsen Music Android App
+# Vertex AI Studio Frontend App with Node.js Backend
 
-This is a native Android application that displays a marker on a Google Map.
+This repository contains a frontend and a Node.js backend, designed to run together.
+The backend acts as a proxy, handling Google Cloud API calls.
 
-## Getting Started
+This project is intended for demonstration and prototyping purposes only.
+It is not intended for use in a production environment.
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+## Prerequisites
 
-### Prerequisites
+To run this application locally, you need:
 
-*   Android Studio
-*   An Android Virtual Device (AVD) or a physical Android device
-*   A Google Maps API Key
+*   **[Google Cloud SDK / gcloud CLI](https://cloud.google.com/sdk/docs/install)**: Follow the instructions to install the SDK.
 
-### Installation
+*   **gcloud Initialization**:
+    *   Initialize the gcloud CLI:
+        ```bash
+        gcloud init
+        ```
+    *   Authenticate for Application Default Credentials (needed to call Google Cloud APIs):
+        ```bash
+        gcloud auth application-default login
+        ```
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/MSICaterina/msimobsen-music-android-app.git
-    ```
+*   **Node.js and npm**: Ensure you have Node.js and its package manager, `npm`, installed on your machine.
 
-2.  **Create a `secrets.properties` file:**
-    In the root directory of the project, create a file named `secrets.properties` and add the following lines:
-    ```
-    KEYSTORE_PASSWORD=todayisSundayfunday
-    KEY_PASSWORD=todayisSundayfunday
-    MAPS_API_KEY="YOUR_API_KEY"
-    ```
-    Replace `"YOUR_API_KEY"` with your actual Google Maps API key.
+## Project Structure
 
-## Running the tests
+The project is organized into two main directories:
 
-To run the unit tests, execute the following command in the terminal:
+*   `frontend/`: Contains the Frontend application code.
+*   `backend/`: Contains the Node.js/Express server code to proxy Google Cloud API calls.
+
+## Backend Environment Variables
+
+The `backend/.env.local` file is automatically generated when you download this application.
+It contains essential Google Cloud environment variables pre-configured based on your project settings at the time of download.
+
+The variables set in `backend/.env.local` are:
+*   `API_BACKEND_PORT`: The port the backend API server listens on (e.g., `5000`).
+*   `API_PAYLOAD_MAX_SIZE`: The maximum size of the request payload accepted by the backend server (e.g., `5mb`).
+*   `GOOGLE_CLOUD_LOCATION`: The Google Cloud region associated with your project.
+*   `GOOGLE_CLOUD_PROJECT`: Your Google Cloud Project ID.
+
+**Note:** These variables are automatically populated during the download process.
+You can modify the values in `backend/.env.local` if you need to change them.
+
+## Installation and Running the App
+
+To install dependencies and run your Google Cloud Vertex AI Studio App locally, execute the following command:
 
 ```bash
-gradle-8.4/bin/gradle -p app test
-```
-
-## Running the app
-
-1.  **Install the app:**
-    Make sure you have a running emulator or a connected device. Then, run the following command to install the app:
-    ```bash
-    gradle-8.4/bin/gradle -p app installDebug
-    ```
-
-2.  **Launch the app:**
-    Run the following command to start the app:
-    ```bash
-    adb shell am start -n com.msimobsenmusic/com.msimobsenmusic.MapsMarkerActivity
-    ```
+npm install && npm run dev
