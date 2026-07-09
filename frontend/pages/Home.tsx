@@ -95,6 +95,12 @@ export const Home: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Bottom Banner Ad */}
+      <div className="mt-10 border-t border-dark-100 pt-8">
+        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 text-center">Sponsored</h3>
+        <AdUnit format="auto" className="w-full h-[250px]" />
+      </div>
     </div>
   );
 };
