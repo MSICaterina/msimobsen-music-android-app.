@@ -27,6 +27,11 @@ export const Discover: React.FC = () => {
         </div>
       </div>
 
+      {/* Top Banner Ad */}
+      <div className="mb-8">
+        <AdUnit format="fluid" className="w-full h-[100px]" />
+      </div>
+
       <h2 className="text-2xl font-bold text-white mb-6">Browse All</h2>
       
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10">
