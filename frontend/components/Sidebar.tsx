@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Home, Compass, Radio, Library, PlusSquare, Heart, Music2, Activity } from 'lucide-react';
+import { AdUnit } from './AdUnit.tsx';
 
 export const Sidebar: React.FC = () => {
   const navItems = [
@@ -73,9 +74,8 @@ export const Sidebar: React.FC = () => {
       {/* Sidebar Bottom Ad Unit */}
       <div className="p-4 mt-auto">
         <div className="text-xs text-gray-500 text-center mb-2">Sponsored</div>
-        <div className="bg-dark-200 rounded-lg h-48 flex items-center justify-center border border-dark-100">
-           <span className="text-gray-600 text-sm">Ad Space (200x200)</span>
-           {/* In a real scenario, replace with: <AdUnit format="rectangle" className="w-full h-full" /> */}
+        <div className="bg-dark-200 rounded-lg h-48 flex items-center justify-center border border-dark-100 overflow-hidden">
+           <AdUnit format="rectangle" className="w-full h-full" />
         </div>
       </div>
     </aside>
