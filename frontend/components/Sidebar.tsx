@@ -1,14 +1,25 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Compass, Radio, Library, PlusSquare, Heart, Music2, Activity } from 'lucide-react';
+import { Home, Compass, Radio, Library, PlusSquare, Heart, Music2, Activity, DollarSign, ShoppingCart, BarChart3 } from 'lucide-react';
 import { AdUnit } from './AdUnit.tsx';
+import { useSimulatedTime } from '../utils/useSimulatedTime.ts';
 
 export const Sidebar: React.FC = () => {
+  const { formattedTime, formattedDate, timeZone, location } = useSimulatedTime();
+
   const navItems = [
     { icon: Home, label: 'Home', path: '/' },
     { icon: Compass, label: 'Discover', path: '/discover' },
     { icon: Radio, label: 'News & Blog', path: '/news' },
     { icon: Activity, label: 'Live Traffic', path: '/analytics' },
+    { icon: BarChart3, label: 'Daily Summary', path: '/summary' },
+    { icon: DollarSign, label: 'Monetization & Agent', path: '/agent' },
+    { 
+      icon: ShoppingCart, 
+      label: 'Web3 Access', 
+      path: 'https://msimobsenmusic.com/shop/ols/products/msimobsenmusicnetworkaccessweb3',
+      external: true 
+    },
   ];
 
   const libraryItems = [
@@ -31,23 +42,36 @@ export const Sidebar: React.FC = () => {
           <p className="px-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Menu</p>
           <ul className="space-y-1">
             {navItems.map((item) => (
-              <li key={item.path}>
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `flex items-center gap-4 px-3 py-2 rounded-md transition-colors ${
-                      isActive
-                        ? 'bg-dark-100 text-brand-500 font-medium'
-                        : 'text-gray-400 hover:text-gray-100 hover:bg-dark-200'
-                    }`
-                  }
-                >
-                  <item.icon size={20} />
-                  {item.label}
-                  {item.label === 'Live Traffic' && (
-                    <span className="ml-auto w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                  )}
-                </NavLink>
+              <li key={item.label}>
+                {item.external ? (
+                  <a
+                    href={item.path}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-4 px-3 py-2 rounded-md text-brand-300 hover:text-white hover:bg-brand-900/30 transition-colors border border-transparent hover:border-brand-500/30"
+                  >
+                    <item.icon size={20} />
+                    {item.label}
+                    <span className="ml-auto text-[10px] font-bold bg-brand-600 text-white px-1.5 py-0.5 rounded">C$18</span>
+                  </a>
+                ) : (
+                  <NavLink
+                    to={item.path}
+                    className={({ isActive }) =>
+                      `flex items-center gap-4 px-3 py-2 rounded-md transition-colors ${
+                        isActive
+                          ? 'bg-dark-100 text-brand-500 font-medium'
+                          : 'text-gray-400 hover:text-gray-100 hover:bg-dark-200'
+                      }`
+                    }
+                  >
+                    <item.icon size={20} />
+                    {item.label}
+                    {item.label === 'Live Traffic' && (
+                      <span className="ml-auto w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    )}
+                  </NavLink>
+                )}
               </li>
             ))}
           </ul>
@@ -70,6 +94,15 @@ export const Sidebar: React.FC = () => {
           </ul>
         </div>
       </nav>
+
+      {/* Simulated Clock Widget */}
+      <div className="px-4 mt-4">
+        <div className="bg-dark-200 rounded-lg p-3 border border-dark-100 text-center shadow-inner">
+          <p className="text-brand-400 font-mono text-lg font-bold tracking-wider">{formattedTime}</p>
+          <p className="text-gray-400 text-xs mt-1">{formattedDate}</p>
+          <p className="text-gray-500 text-[10px] mt-0.5 uppercase tracking-widest">{timeZone} • {location}</p>
+        </div>
+      </div>
 
       {/* Sidebar Bottom Ad Unit */}
       <div className="p-4 mt-auto">
