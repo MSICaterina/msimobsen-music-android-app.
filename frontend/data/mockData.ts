@@ -13,17 +13,17 @@ export const latestNews: NewsArticle[] = [
   {
     id: 'n1',
     title: 'The Rise of AI in Music Production: What You Need to Know',
-    excerpt: 'How artificial intelligence is shaping the future of beat making and vocal synthesis in 2024.',
+    excerpt: 'How artificial intelligence is shaping the future of beat making and vocal synthesis in 2026.',
     imageUrl: 'https://picsum.photos/seed/news1/600/400',
-    date: 'Oct 24, 2024',
+    date: 'Jul 8, 2026',
     category: 'Industry'
   },
   {
     id: 'n2',
-    title: 'Top 10 Indie Artists to Watch This Fall',
+    title: 'Top 10 Indie Artists to Watch This Summer',
     excerpt: 'Discover the underground talent that is about to break into the mainstream charts.',
     imageUrl: 'https://picsum.photos/seed/news2/600/400',
-    date: 'Oct 22, 2024',
+    date: 'Jul 6, 2026',
     category: 'Discovery'
   },
   {
@@ -31,7 +31,7 @@ export const latestNews: NewsArticle[] = [
     title: 'Festival Season Recap: The Best Performances',
     excerpt: 'A look back at the most electrifying live shows from this summers biggest music festivals.',
     imageUrl: 'https://picsum.photos/seed/news3/600/400',
-    date: 'Oct 20, 2024',
+    date: 'Jul 4, 2026',
     category: 'Live Music'
   }
 ];
