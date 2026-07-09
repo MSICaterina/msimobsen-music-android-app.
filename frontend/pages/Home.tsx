@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, MoreHorizontal, Clock } from 'lucide-react';
+import { Play, MoreHorizontal, Clock, ShoppingCart } from 'lucide-react';
 import { trendingTracks } from '../data/mockData.ts';
 import { AdUnit } from '../components/AdUnit.tsx';
 
@@ -22,6 +22,27 @@ export const Home: React.FC = () => {
             <Play size={20} className="fill-white" />
             Listen Now
           </button>
+        </div>
+      </div>
+
+      {/* Web3 Network Access Promotional Banner */}
+      <div className="mb-10 bg-gradient-to-r from-brand-950 via-brand-900 to-dark-200 rounded-2xl p-8 border border-brand-500/50 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl shadow-brand-900/20">
+        <div>
+          <span className="bg-brand-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">Premium Web3 Access</span>
+          <h3 className="text-2xl md:text-3xl font-extrabold text-white mb-2">MSIMobsen Music Network</h3>
+          <p className="text-brand-100 max-w-xl text-sm md:text-base">Unlock exclusive Web3 features, decentralized streaming, and direct artist support. Join the future of music today.</p>
+        </div>
+        <div className="flex flex-col items-center gap-3 w-full md:w-auto">
+          <span className="text-3xl font-bold text-white">C$18.00</span>
+          <a 
+            href="https://msimobsenmusic.com/shop/ols/products/msimobsenmusicnetworkaccessweb3" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="w-full md:w-auto bg-white text-brand-900 hover:bg-gray-100 px-8 py-3 rounded-full font-bold transition-colors flex items-center justify-center gap-2 shadow-lg shadow-white/10"
+          >
+            <ShoppingCart size={20} />
+            Get Access Now
+          </a>
         </div>
       </div>
 
