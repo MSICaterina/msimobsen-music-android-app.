@@ -7,6 +7,8 @@ import { Home } from './pages/Home.tsx';
 import { Discover } from './pages/Discover.tsx';
 import { News } from './pages/News.tsx';
 import { Analytics } from './pages/Analytics.tsx';
+import { Agent } from './pages/Agent.tsx';
+import { Summary } from './pages/Summary.tsx';
 
 // Component to track page views on route change for Google Analytics
 const PageViewTracker: React.FC = () => {
@@ -41,6 +43,8 @@ const App: React.FC = () => {
               <Route path="/discover" element={<Discover />} />
               <Route path="/news" element={<News />} />
               <Route path="/analytics" element={<Analytics />} />
+              <Route path="/agent" element={<Agent />} />
+              <Route path="/summary" element={<Summary />} />
               {/* Fallback route */}
               <Route path="*" element={<Home />} />
             </Routes>
