@@ -8,7 +8,7 @@
     "agent:start": "msimobsenutility start"
   },
   "devDependencies": {
-    "concurrently": "latest",
+    "concurrently": "^8.2.2",
     "msimobsenutility": "latest"
   }
 }
