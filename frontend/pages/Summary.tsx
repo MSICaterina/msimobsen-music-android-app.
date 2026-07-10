@@ -1,54 +1,105 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { TrendingUp, DollarSign, Cpu, Users, ArrowUpRight, Calendar } from 'lucide-react';
+import { TrendingUp, DollarSign, Cpu, Users, ArrowUpRight, Calendar, ChevronDown } from 'lucide-react';
 import { AdUnit } from '../components/AdUnit.tsx';
-import { useSimulatedTime } from '../utils/useSimulatedTime.ts';
 
-// Mock data for the last 7 days ending on Thursday (July 9, 2026)
-const dailyData = [
-  { day: 'Fri', traffic: 12400, revenue: 145.50, agentTasks: 850 },
-  { day: 'Sat', traffic: 13500, revenue: 162.20, agentTasks: 920 },
-  { day: 'Sun', traffic: 12800, revenue: 150.00, agentTasks: 890 },
-  { day: 'Mon', traffic: 15200, revenue: 185.80, agentTasks: 1100 },
-  { day: 'Tue', traffic: 17500, revenue: 210.40, agentTasks: 1350 },
-  { day: 'Wed', traffic: 22000, revenue: 280.90, agentTasks: 1800 },
-  { day: 'Thu', traffic: 24500, revenue: 315.20, agentTasks: 2100 },
-];
+const growthRates = {
+  week: { traffic: 12.5, revenue: 15.2, tasks: 8.4 },
+  month: { traffic: 24.8, revenue: 28.5, tasks: 18.2 },
+  year: { traffic: 145.2, revenue: 160.4, tasks: 120.5 }
+};
+
+const formatNumber = (num: number) => {
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+  if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+  return num.toString();
+};
 
 export const Summary: React.FC = () => {
-  const { formattedDate } = useSimulatedTime();
-
-  // Calculate totals and growth
-  const today = dailyData[dailyData.length - 1];
-  const yesterday = dailyData[dailyData.length - 2];
+  const [timeframe, setTimeframe] = useState<'week' | 'month' | 'year'>('week');
   
-  const calculateGrowth = (current: number, previous: number) => {
-    return (((current - previous) / previous) * 100).toFixed(1);
-  };
+  // Use actual current timestamp
+  const [initialTimestamp] = useState(Date.now());
+  const formattedDate = new Date(initialTimestamp).toLocaleDateString('en-US', { timeZone: 'America/Toronto', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+  // Dynamically generate data ending on the current actual Toronto date
+  const { weeklyData, monthlyData, yearlyData } = useMemo(() => {
+    const getTorontoLabel = (ts: number, format: 'week' | 'month' | 'year') => {
+      const d = new Date(ts);
+      if (format === 'week') return d.toLocaleDateString('en-US', { timeZone: 'America/Toronto', weekday: 'short' });
+      if (format === 'month') return d.toLocaleDateString('en-US', { timeZone: 'America/Toronto', month: 'numeric', day: 'numeric' });
+      if (format === 'year') return d.toLocaleDateString('en-US', { timeZone: 'America/Toronto', month: 'short' });
+      return '';
+    };
+
+    const dayMs = 24 * 60 * 60 * 1000;
+
+    const week = Array.from({ length: 7 }).map((_, i) => {
+      const ts = initialTimestamp - (6 - i) * dayMs;
+      return {
+        label: i === 6 ? 'Today' : getTorontoLabel(ts, 'week'),
+        traffic: 12000 + Math.floor(Math.random() * 5000 + i * 1000),
+        revenue: 140 + Math.floor(Math.random() * 50 + i * 10),
+        agentTasks: 800 + Math.floor(Math.random() * 200 + i * 100),
+      };
+    });
+
+    const month = Array.from({ length: 30 }).map((_, i) => {
+      const ts = initialTimestamp - (29 - i) * dayMs;
+      return {
+        label: i === 29 ? 'Today' : getTorontoLabel(ts, 'month'),
+        traffic: 10000 + Math.floor(Math.random() * 5000 + i * 500),
+        revenue: 120 + Math.floor(Math.random() * 60 + i * 6),
+        agentTasks: 800 + Math.floor(Math.random() * 400 + i * 40),
+      };
+    });
+
+    const currentMonthStr = getTorontoLabel(initialTimestamp, 'year');
+    const monthsList = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const currentMonthIdx = monthsList.indexOf(currentMonthStr) !== -1 ? monthsList.indexOf(currentMonthStr) : new Date(initialTimestamp).getMonth();
+    
+    const year = Array.from({ length: currentMonthIdx + 1 }).map((_, i) => {
+      return {
+        label: i === currentMonthIdx ? `${monthsList[i]} (MTD)` : monthsList[i],
+        traffic: 300000 + Math.floor(Math.random() * 100000 + i * 20000),
+        revenue: 4000 + Math.floor(Math.random() * 1000 + i * 200),
+        agentTasks: 25000 + Math.floor(Math.random() * 5000 + i * 1000),
+      };
+    });
+
+    return { weeklyData: week, monthlyData: month, yearlyData: year };
+  }, [initialTimestamp]);
+
+  const currentData = timeframe === 'week' ? weeklyData : timeframe === 'month' ? monthlyData : yearlyData;
+  const growth = growthRates[timeframe];
+
+  const totalTraffic = currentData.reduce((acc, curr) => acc + curr.traffic, 0);
+  const totalRevenue = currentData.reduce((acc, curr) => acc + curr.revenue, 0);
+  const totalTasks = currentData.reduce((acc, curr) => acc + curr.agentTasks, 0);
 
   const stats = [
     {
-      title: 'Daily Traffic',
-      value: today.traffic.toLocaleString(),
-      growth: calculateGrowth(today.traffic, yesterday.traffic),
+      title: `Total Traffic (${timeframe === 'week' ? '7d' : timeframe === 'month' ? '30d' : 'YTD'})`,
+      value: totalTraffic.toLocaleString(),
+      growth: growth.traffic,
       icon: Users,
       color: 'text-brand-400',
       bg: 'bg-brand-500/10',
       border: 'border-brand-500/20'
     },
     {
-      title: 'Daily Revenue',
-      value: `$${today.revenue.toFixed(2)}`,
-      growth: calculateGrowth(today.revenue, yesterday.revenue),
+      title: `Total Revenue (${timeframe === 'week' ? '7d' : timeframe === 'month' ? '30d' : 'YTD'})`,
+      value: `$${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      growth: growth.revenue,
       icon: DollarSign,
       color: 'text-emerald-400',
       bg: 'bg-emerald-500/10',
       border: 'border-emerald-500/20'
     },
     {
-      title: 'Agent Tasks Executed',
-      value: today.agentTasks.toLocaleString(),
-      growth: calculateGrowth(today.agentTasks, yesterday.agentTasks),
+      title: `Agent Tasks (${timeframe === 'week' ? '7d' : timeframe === 'month' ? '30d' : 'YTD'})`,
+      value: totalTasks.toLocaleString(),
+      growth: growth.tasks,
       icon: Cpu,
       color: 'text-orange-400',
       bg: 'bg-orange-500/10',
@@ -61,13 +112,22 @@ export const Summary: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-4xl font-extrabold text-white">Daily Summary</h1>
+            <h1 className="text-4xl font-extrabold text-white">Traffic & Revenue Summary</h1>
           </div>
-          <p className="text-gray-400">Overview of your traffic growth, ad revenues, and agent automation usage as of {formattedDate}.</p>
+          <p className="text-gray-400">Overview of your platform's performance as of {formattedDate} (Toronto Time).</p>
         </div>
-        <div className="flex items-center gap-2 bg-dark-200 border border-dark-100 px-4 py-2 rounded-lg text-sm text-gray-300">
-          <Calendar size={16} className="text-brand-400" />
-          <span>Last 7 Days</span>
+        
+        <div className="relative">
+          <select
+            value={timeframe}
+            onChange={(e) => setTimeframe(e.target.value as 'week' | 'month' | 'year')}
+            className="appearance-none bg-dark-200 border border-dark-100 px-4 py-2 pr-10 rounded-lg text-sm text-white font-medium focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 cursor-pointer"
+          >
+            <option value="week">Last 7 Days</option>
+            <option value="month">Last 30 Days</option>
+            <option value="year">This Year (YTD)</option>
+          </select>
+          <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
         </div>
       </div>
 
@@ -104,7 +164,7 @@ export const Summary: React.FC = () => {
           </h2>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={dailyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={currentData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorTraffic" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
@@ -112,11 +172,12 @@ export const Summary: React.FC = () => {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
-                <XAxis dataKey="day" stroke="#4b5563" fontSize={12} tickMargin={10} />
-                <YAxis stroke="#4b5563" fontSize={12} tickFormatter={(value) => `${value / 1000}k`} />
+                <XAxis dataKey="label" stroke="#4b5563" fontSize={12} tickMargin={10} />
+                <YAxis stroke="#4b5563" fontSize={12} tickFormatter={formatNumber} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#111827', borderColor: '#1f2937', color: '#f3f4f6' }}
                   itemStyle={{ color: '#8b5cf6' }}
+                  formatter={(value: number) => [value.toLocaleString(), 'Traffic']}
                 />
                 <Area type="monotone" dataKey="traffic" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorTraffic)" />
               </AreaChart>
@@ -128,18 +189,19 @@ export const Summary: React.FC = () => {
         <div className="bg-dark-200 rounded-2xl p-6 border border-dark-100">
           <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
             <DollarSign className="text-emerald-400" size={20} />
-            Daily AdSense Revenue
+            AdSense Revenue
           </h2>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={dailyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <BarChart data={currentData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
-                <XAxis dataKey="day" stroke="#4b5563" fontSize={12} tickMargin={10} />
-                <YAxis stroke="#4b5563" fontSize={12} tickFormatter={(value) => `$${value}`} />
+                <XAxis dataKey="label" stroke="#4b5563" fontSize={12} tickMargin={10} />
+                <YAxis stroke="#4b5563" fontSize={12} tickFormatter={(value) => `$${formatNumber(value)}`} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#111827', borderColor: '#1f2937', color: '#f3f4f6' }}
                   cursor={{ fill: '#1f2937' }}
                   itemStyle={{ color: '#10b981' }}
+                  formatter={(value: number) => [`$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 'Revenue']}
                 />
                 <Bar dataKey="revenue" fill="#10b981" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -155,20 +217,21 @@ export const Summary: React.FC = () => {
               Agent Automation Usage
             </h2>
             <div className="text-sm text-gray-400 bg-dark-300 px-3 py-1.5 rounded-lg border border-dark-100">
-              Total Tasks (7d): <strong className="text-white">{dailyData.reduce((acc, curr) => acc + curr.agentTasks, 0).toLocaleString()}</strong>
+              Total Tasks: <strong className="text-white">{totalTasks.toLocaleString()}</strong>
             </div>
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={dailyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <LineChart data={currentData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
-                <XAxis dataKey="day" stroke="#4b5563" fontSize={12} tickMargin={10} />
-                <YAxis stroke="#4b5563" fontSize={12} />
+                <XAxis dataKey="label" stroke="#4b5563" fontSize={12} tickMargin={10} />
+                <YAxis stroke="#4b5563" fontSize={12} tickFormatter={formatNumber} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#111827', borderColor: '#1f2937', color: '#f3f4f6' }}
                   itemStyle={{ color: '#f97316' }}
+                  formatter={(value: number) => [value.toLocaleString(), 'Tasks Executed']}
                 />
-                <Line type="monotone" dataKey="agentTasks" name="Tasks Executed" stroke="#f97316" strokeWidth={3} dot={{ fill: '#f97316', strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="agentTasks" name="Tasks Executed" stroke="#f97316" strokeWidth={3} dot={{ fill: '#f97316', strokeWidth: 2, r: timeframe === 'month' ? 0 : 4 }} activeDot={{ r: 6 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
