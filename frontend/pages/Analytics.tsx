@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Users, Eye, MousePointerClick, DollarSign, Activity, TrendingUp, ShoppingCart, ArrowRight } from 'lucide-react';
 import { AdUnit } from '../components/AdUnit.tsx';
-import { useSimulatedTime, getGlobalSimulatedTime } from '../utils/useSimulatedTime.ts';
 
-// Generate initial mock data for the chart using simulated time
+// Generate initial mock data for the chart using actual time
 const generateInitialData = () => {
   const data = [];
-  const now = getGlobalSimulatedTime();
+  const now = Date.now();
   let currentUsers = 1200;
   for (let i = 20; i >= 0; i--) {
     const time = new Date(now - i * 3000);
@@ -21,7 +20,8 @@ const generateInitialData = () => {
 };
 
 export const Analytics: React.FC = () => {
-  const { formattedTime, formattedDate } = useSimulatedTime();
+  const formattedDate = new Date().toLocaleDateString('en-US', { timeZone: 'America/Toronto', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  
   const [trafficData, setTrafficData] = useState(generateInitialData());
   const [activeUsers, setActiveUsers] = useState(trafficData[trafficData.length - 1].users);
   const [pageViews, setPageViews] = useState(145892);
@@ -38,7 +38,7 @@ export const Analytics: React.FC = () => {
         const nextUsers = Math.max(800, prev + change);
         
         setTrafficData((currentData) => {
-          const now = new Date(getGlobalSimulatedTime());
+          const now = new Date();
           const newDataPoint = {
             time: now.toLocaleTimeString('en-US', { timeZone: 'America/Toronto', hour: '2-digit', minute: '2-digit', second: '2-digit' }),
             users: nextUsers,
