@@ -1,14 +1,12 @@
 {
   "name": "msimobsen-music",
-  "workspaces": ["frontend", "backend", "msimobsenutility"], 
+  "workspaces": ["frontend", "backend"], 
   "scripts": {
     "dev-frontend": "npm run dev --prefix frontend",
     "dev-backend": "npm run dev --prefix backend",
-    "dev": "concurrently \"npm run dev-frontend\" \"npm run dev-backend\"",
-    "agent:start": "msimobsenutility start"
+    "dev": "concurrently \"npm run dev-frontend\" \"npm run dev-backend\""
   },
   "devDependencies": {
-    "concurrently": "^8.2.2",
-    "msimobsenutility": "file:./msimobsenutility"
+    "concurrently": "latest"
   }
 }
