@@ -30,7 +30,9 @@ export const useSimulatedTime = () => {
     formattedTime: date.toLocaleTimeString('en-US', { timeZone: 'America/Toronto', hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true }),
     formattedDate: date.toLocaleDateString('en-US', { timeZone: 'America/Toronto', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
     timeZone: 'EDT',
-    location: 'Toronto, ON'
+    location: 'Toronto, ON',
+    londonTime: date.toLocaleTimeString('en-US', { timeZone: 'Europe/London', hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true }),
+    londonDate: date.toLocaleDateString('en-US', { timeZone: 'Europe/London', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
   };
 };
 
