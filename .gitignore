@@ -25,3 +25,10 @@ local.properties
 .DS_Store
 captures/
 .externalNativeBuild
+
+# Node/npm
+node_modules/
+*.log
+npm-debug.log*
+yarn.lock
+package-lock.json
