@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Cpu, Terminal, Copy, CheckCircle2, Package, KeyRound, DollarSign, Wallet, ArrowRight, ShieldCheck, TrendingUp, Settings, Zap, RefreshCw, Coins } from 'lucide-react';
+import { Cpu, Terminal, Copy, CheckCircle2, Package, KeyRound, DollarSign, Wallet, ArrowRight, ShieldCheck, TrendingUp, Settings, Zap, RefreshCw, Coins, Server, ExternalLink, Link as LinkIcon, Bot, Send } from 'lucide-react';
+import { GoogleGenAI } from '@google/genai';
 import { AdUnit } from '../components/AdUnit.tsx';
-import { useSimulatedTime, getGlobalSimulatedTime } from '../utils/useSimulatedTime.ts';
+
+declare const process: { env: { API_KEY: string } };
 
 const MOCK_LOGS = [
   "Optimizing ad slot pub-••••••••••••...",
@@ -15,11 +17,12 @@ const MOCK_LOGS = [
 ];
 
 export const Agent: React.FC = () => {
-  const { formattedDate } = useSimulatedTime();
+  const formattedDate = new Date().toLocaleDateString('en-US', { timeZone: 'America/Toronto', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   // Agent Token State
   const [token, setToken] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   // AdSense Revenue State
   const [balance, setBalance] = useState(84.50);
@@ -35,14 +38,21 @@ export const Agent: React.FC = () => {
 
   // Agent Logs State
   const [logs, setLogs] = useState<string[]>([
-    `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Agent initialized. Monitoring traffic...`
+    `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Agent initialized. Monitoring traffic...`
   ]);
+
+  // AI Chat State
+  const [chatInput, setChatInput] = useState('');
+  const [chatHistory, setChatHistory] = useState<{role: string, text: string}[]>([
+    { role: 'model', text: 'Hello! I am your MSIMobsen utility agent. How can I help you optimize your traffic and revenue today?' }
+  ]);
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
       const newLog = MOCK_LOGS[Math.floor(Math.random() * MOCK_LOGS.length)];
       setLogs(prev => {
-        const updated = [...prev, `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] ${newLog}`];
+        const updated = [...prev, `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] ${newLog}`];
         return updated.slice(-6); // Keep last 6 logs
       });
     }, 3500);
@@ -68,7 +78,7 @@ export const Agent: React.FC = () => {
     const newRevenue = Math.random() * 3 + 0.5;
     setBalance(prev => prev + newRevenue);
     setPayoutMessage(null);
-    setLogs(prev => [...prev.slice(-5), `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Manual revenue simulation triggered: +$${newRevenue.toFixed(2)}`]);
+    setLogs(prev => [...prev.slice(-5), `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Manual revenue simulation triggered: +$${newRevenue.toFixed(2)}`]);
   };
 
   const handlePayout = (method: 'bank' | 'web3') => {
@@ -78,8 +88,48 @@ export const Agent: React.FC = () => {
         setBalance(0);
         setIsWithdrawing(false);
         setPayoutMessage(`Success! Funds have been transferred to your connected ${method === 'bank' ? 'bank account' : 'Web3 wallet'}.`);
-        setLogs(prev => [...prev.slice(-5), `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Payout executed via ${method.toUpperCase()}. Balance reset.`]);
+        setLogs(prev => [...prev.slice(-5), `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Payout executed via ${method.toUpperCase()}. Balance reset.`]);
       }, 2000);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!chatInput.trim()) return;
+    const msg = chatInput;
+    setChatInput('');
+    setChatHistory(prev => [...prev, { role: 'user', text: msg }]);
+    setIsTyping(true);
+
+    try {
+      const ai = new GoogleGenAI({apiKey: process.env.API_KEY, vertexai: true});
+      
+      // 1. Generate the context block using current actual time (datetime.now() equivalent)
+      const currentActualDate = new Date();
+      
+      // Format date as YYYY-MM-DD and time as HH:MM in Toronto timezone
+      const dateStr = currentActualDate.toLocaleDateString('en-CA', { timeZone: 'America/Toronto' });
+      const timeStr = currentActualDate.toLocaleTimeString('en-CA', { timeZone: 'America/Toronto', hour12: false, hour: '2-digit', minute: '2-digit' });
+      
+      const contextHeader = `[Context - Date: ${dateStr}, Time: ${timeStr}, Location: Toronto, Canada]\n\n`;
+      
+      // 2. Combine context and query
+      const fullPrompt = `${contextHeader}User Request: ${msg}`;
+      
+      // 3. Send request
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: fullPrompt,
+        config: {
+          systemInstruction: 'You are the MSIMobsen utility agent. Use the provided real-time datetime context for any time-sensitive queries.',
+        }
+      });
+
+      setChatHistory(prev => [...prev, { role: 'model', text: response.text }]);
+    } catch (error) {
+      console.error(error);
+      setChatHistory(prev => [...prev, { role: 'model', text: 'Error: Unable to reach the AI model. Please check your API key configuration.' }]);
+    } finally {
+      setIsTyping(false);
     }
   };
 
@@ -200,6 +250,109 @@ export const Agent: React.FC = () => {
             </div>
           </div>
 
+          {/* AI Agent Chat Card */}
+          <div className="bg-dark-200 rounded-2xl p-8 border border-dark-100 flex flex-col h-[500px]">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="bg-purple-600 p-3 rounded-xl">
+                <Bot size={24} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white">Agent Assistant (AI)</h2>
+                <p className="text-sm text-gray-400">Ask the agent to analyze traffic, optimize ads, or check Web3 sales.</p>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto bg-dark-300 rounded-xl p-4 mb-4 border border-dark-100 space-y-4">
+              {chatHistory.map((msg, idx) => (
+                <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[80%] rounded-xl p-3 text-sm ${msg.role === 'user' ? 'bg-brand-600 text-white' : 'bg-dark-100 text-gray-200 border border-dark-50'}`}>
+                    {msg.text}
+                  </div>
+                </div>
+              ))}
+              {isTyping && (
+                <div className="flex justify-start">
+                  <div className="bg-dark-100 text-gray-400 border border-dark-50 rounded-xl p-3 text-sm animate-pulse">
+                    Agent is thinking...
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                placeholder="Ask the agent..."
+                className="flex-1 bg-dark-300 border border-dark-100 rounded-xl px-4 py-2 text-white focus:outline-none focus:border-brand-500"
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={isTyping || !chatInput.trim()}
+                className="bg-brand-600 hover:bg-brand-500 disabled:bg-dark-100 disabled:text-gray-500 text-white p-3 rounded-xl transition-colors"
+              >
+                <Send size={20} />
+              </button>
+            </div>
+          </div>
+
+          {/* NPM Integration & MCP Card */}
+          <div className="bg-dark-200 rounded-2xl p-8 border border-dark-100 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
+              <Server size={120} />
+            </div>
+            
+            <div className="flex items-center gap-4 mb-6">
+              <div className="bg-blue-600 p-3 rounded-xl">
+                <Package size={24} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white">NPM Integration & MCP</h2>
+                <p className="text-sm text-gray-400">Install and configure the msimobsenutility CLI with Model Context Protocol.</p>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
+                  <span className="bg-dark-100 text-gray-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                  Install the package globally
+                </h3>
+                <div className="bg-dark-300 rounded-lg p-4 border border-dark-100 flex items-center gap-3 font-mono text-sm">
+                  <Terminal size={16} className="text-gray-500 flex-shrink-0" />
+                  <span className="text-gray-300 break-all">npm install -g <span className="text-brand-400">msimobsenutility</span></span>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
+                  <span className="bg-dark-100 text-gray-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                  Authenticate your agent
+                </h3>
+                <div className="bg-dark-300 rounded-lg p-4 border border-dark-100 flex items-center gap-3 font-mono text-sm">
+                  <Terminal size={16} className="text-gray-500 flex-shrink-0" />
+                  <span className="text-gray-300 break-all">msimobsen auth --token <span className="text-brand-400">{token || '<YOUR_TOKEN>'}</span></span>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
+                  <span className="bg-dark-100 text-gray-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
+                  Start the agent with MCP enabled
+                </h3>
+                <div className="bg-dark-300 rounded-lg p-4 border border-dark-100 flex items-center gap-3 font-mono text-sm">
+                  <Terminal size={16} className="text-gray-500 flex-shrink-0" />
+                  <span className="text-gray-300 break-all">msimobsen start --watch <span className="text-emerald-400">--mcp</span></span>
+                </div>
+                <p className="text-xs text-gray-500 mt-3 ml-8 leading-relaxed">
+                  Enabling <strong className="text-gray-300">MCP (Model Context Protocol)</strong> allows the agent to securely interface with your local environment, external AI models, and real-time traffic analytics to optimize ad placements dynamically.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Agent Automation Settings */}
           <div className="bg-dark-200 rounded-2xl p-8 border border-dark-100">
             <div className="flex items-center gap-4 mb-6">
@@ -274,8 +427,8 @@ export const Agent: React.FC = () => {
                 <KeyRound size={24} className="text-white" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white">Workflow Token</h2>
-                <p className="text-sm text-gray-400">Generate a token to authenticate your local NPM agent.</p>
+                <h2 className="text-2xl font-bold text-white">Workflow Token & Auth</h2>
+                <p className="text-sm text-gray-400">Generate a token to authenticate your local NPM agent (with MCP support) or login via OAuth.</p>
               </div>
             </div>
 
@@ -298,13 +451,24 @@ export const Agent: React.FC = () => {
               )}
             </div>
 
-            <button 
-              onClick={generateToken}
-              className="bg-brand-600 hover:bg-brand-500 text-white font-bold py-3 px-6 rounded-xl transition-colors flex items-center gap-2 shadow-lg shadow-brand-900/20"
-            >
-              <Cpu size={20} />
-              {token ? 'Regenerate Token' : 'Generate Workflow Token'}
-            </button>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button 
+                onClick={generateToken}
+                className="flex-1 bg-brand-600 hover:bg-brand-500 text-white font-bold py-3 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg shadow-brand-900/20"
+              >
+                <Cpu size={20} />
+                {token ? 'Regenerate Token' : 'Generate Workflow Token'}
+              </button>
+              <a 
+                href="https://msimobsen-30560796-7c5e1.web.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 bg-dark-100 hover:bg-dark-50 text-white font-bold py-3 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 border border-dark-50"
+              >
+                <KeyRound size={20} className="text-brand-400" />
+                OAuth Client Login
+              </a>
+            </div>
           </div>
 
         </div>
@@ -312,6 +476,36 @@ export const Agent: React.FC = () => {
         {/* Sidebar for Logs & Info */}
         <div className="space-y-8">
           
+          {/* Customer Access & Info */}
+          <div className="bg-dark-200 p-6 rounded-2xl border border-dark-100">
+            <h3 className="text-lg font-bold text-white mb-2">Customer Access & Info</h3>
+            <p className="text-sm text-gray-400 mb-4">
+              Access detailed information about monetization and agent features, or share the portal link.
+            </p>
+            <div className="space-y-3">
+              <a 
+                href="https://msimobsenmusic.com/about" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="flex items-center justify-center gap-2 w-full bg-dark-300 hover:bg-dark-100 text-white text-sm font-semibold py-2.5 rounded-lg border border-dark-100 transition-colors"
+              >
+                <ExternalLink size={16} className="text-brand-400" />
+                About Monetization & Agent
+              </a>
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText('https://genai-app-msimobsenmusic-1-1783599542654-762658008656.us-central1.run.app/?key=uPKsTF6WgnWXmvtDZHPfsni9T0abFshO#/agent');
+                  setLinkCopied(true);
+                  setTimeout(() => setLinkCopied(false), 2000);
+                }}
+                className="flex items-center justify-center gap-2 w-full bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold py-2.5 rounded-lg transition-colors"
+              >
+                {linkCopied ? <CheckCircle2 size={16} /> : <LinkIcon size={16} />}
+                {linkCopied ? 'Link Copied!' : 'Copy Agent Portal Link'}
+              </button>
+            </div>
+          </div>
+
           {/* Live Agent Logs */}
           <div className="bg-dark-200 rounded-2xl border border-dark-100 overflow-hidden flex flex-col h-[400px]">
             <div className="p-4 border-b border-dark-100 bg-dark-300 flex items-center gap-3">
@@ -331,19 +525,6 @@ export const Agent: React.FC = () => {
                 </div>
               ))}
               <div className="animate-pulse text-gray-500 mt-2">_</div>
-            </div>
-          </div>
-
-          <div className="bg-dark-200 p-6 rounded-2xl border border-dark-100">
-            <h3 className="text-lg font-bold text-white mb-2">NPM Integration</h3>
-            <p className="text-sm text-gray-400 mb-4">
-              Install the <code className="text-brand-400 bg-dark-300 px-1 rounded">msimobsenutility</code> CLI to run the agent locally.
-            </p>
-            <div className="bg-dark-300 rounded-lg p-3 border border-dark-100 font-mono text-xs text-gray-300 mb-3">
-              npm install -g msimobsenutility
-            </div>
-            <div className="bg-dark-300 rounded-lg p-3 border border-dark-100 font-mono text-xs text-gray-300">
-              msimobsen start --watch
             </div>
           </div>
 
