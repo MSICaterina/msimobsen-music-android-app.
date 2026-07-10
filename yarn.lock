@@ -1,14 +1,94 @@
-# THIS IS AN AUTO-GENERATED LOCKFILE
-# It is recommended you run `yarn install` locally and replace this file with a real yarn.lock.
+# THIS IS A GENERATED FILE. DO NOT EDIT DIRECTLY.
+# See https://yarnpkg.com/getting-started/qa#which-files-should-be-committed-to-git
+
+"@types/node@^25.2.0":
+  version "25.2.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-25.2.0.tgz"
+  integrity sha512-FjWSb/yJuRMC6/ydKnOSwNbB8YYTOv3CvMt3Ml6NKNAdhPn2G1xSNLUITcK2VmO82TYWW2CY8fX2ZDthKn3dRg==
+
+concurrently@^8.2.2:
+  version "8.2.2"
+  resolved "https://registry.yarnpkg.com/concurrently/-/concurrently-8.2.2.tgz"
+  integrity sha512-1dP4gpXFzl8aZr02VUBWMCVrfC1X91tJoyo0qvqNSiGiiHvtPv4lIpPuyR37MWUvVztulxSowf1QbkIJbTw0vw==
+  dependencies:
+    chalk "^4.1.2"
+    date-fns "^2.30.0"
+    lodash "^4.17.21"
+    nx "latest"
+    shell-quote "^1.8.1"
+    spawn-command "^0.0.2-1"
+    tree-kill "^1.2.2"
+
+chalk@^4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.1.2.tgz"
+  integrity sha512-oKnbhFyRIXpnozKRvCJc/BzwQYzJ5zV/wsaqLFWTer58NS50R7auvUt2I64fdd8pFa4Xj4APEc5/4CeZPezf3A==
+  dependencies:
+    ansi-styles "^4.1.0"
+    supports-color "^7.1.0"
+
+ansi-styles@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/ansi-styles/-/ansi-styles-4.1.0.tgz"
+  integrity sha512-fsVL5QWAqwktz0dQnifdc7E2UXLc7B00pEewUnvnZaAoPXibtcb2g7E50Z9SNQAvDaPBER+9P8zNzg3dA8OaZw==
+  dependencies:
+    color-convert "^2.0.1"
+
+color-convert@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/color-convert/-/color-convert-2.0.1.tgz"
+  integrity sha512-RRECPsj7iu/xb5oKYcsFHe5+dBVzRvggdDb5+BjxWaYFUicVUvn5ylCNtdaSRrNAiek6MBZyoJcsWt+aLfmEZA==
+  dependencies:
+    color-name "~1.1.4"
+
+color-name@~1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/color-name/-/color-name-1.1.4.tgz"
+  integrity sha512-dOy+3AuW3a2wNbZHIk0PRxeEZVZSHUNqHoPL2Schz3qqLZcCK3J0KL8nyZPkOwr4k4BFcdZbtLGL+j1DcQHmzg==
+
+date-fns@^2.30.0:
+  version "2.30.0"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.30.0.tgz"
+  integrity sha512-fnULvOpxnC5/Vg3NCHstras5b3bDFcWVgN8/ykKb0Ts28vIsZIYE7ambQvKxNeKVi+hackeLWhojjFs0zII1NY==
+
+lodash@^4.17.21:
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz"
+  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vZ7mLcPQgHCbFlLQTlXzCJk34wFyNo7J1oxNHl62odDiGS57B3w==
+
+nx@latest:
+  version "19.5.4"
+  resolved "https://registry.yarnpkg.com/nx/-/nx-19.5.4.tgz"
+  integrity sha512-EzEbHeEyGbpd3D5E3iSLvKZNRxcXR5XXVsxaYYtZLBcOY/Gg7xFa4cBp3Qs1z2dEHy2P2mKrNzLGfpYLvqTKg==
+
+shell-quote@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/shell-quote/-/shell-quote-1.8.1.tgz"
+  integrity sha512-6j1W9l1iW6pUEm+9/6L5LLjUuGqz4OXrE6+vFCvvP6bGLXL6rMhsEQVLtNFHQdHe3aIj1jPgYKlY/BZlVOPBKQ==
+
+spawn-command@^0.0.2-1:
+  version "0.0.2-1"
+  resolved "https://registry.yarnpkg.com/spawn-command/-/spawn-command-0.0.2-1.tgz"
+  integrity sha512-n98l9jNwktSTWZ0SE7PivoVWzn1ZN63fo/3r+5mWp5P15+5s47mdpJXWAJtQ6goes/DvzDrLvwoLl2SGW+bohA==
+
+tree-kill@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/tree-kill/-/tree-kill-1.2.2.tgz"
+  integrity sha512-L0Orpi873PS6v910eC5uIe0C78IExZMUC8MujNPme4UjjxjIQVOB7/MmDOU/34gSYMNWIreewv7reportZV5g9A==
+
+supports-color@^7.1.0:
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-7.2.0.tgz"
+  integrity sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0o2fpLlqceqxon/NChs3efgHQYAE5Q7twQSma5zw==
+  dependencies:
+    has-flag "^4.0.0"
+
+has-flag@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/has-flag/-/has-flag-4.0.0.tgz"
+  integrity sha512-EykJT/Q1KjTWctWgxJ5duH0gKF1os9nqvygEk5remoXFm+2olxZ5QSJqCEhl9SI+9mbNnnYx2V5g5Z6ke1x9zw==
 
 msimobsenutility@latest:
-  version "<placeholder>-latest"
-  resolved "https://registry.yarnpkg.com/msimobsenutility/-/msimobsenutility.tgz"
-  integrity sha512-<placeholder>
-
-concurrently@latest:
-  version "<placeholder>-latest"
-  resolved "https://registry.yarnpkg.com/concurrently/-/concurrently.tgz"
-  integrity sha512-<placeholder>
-
-# End of placeholder lockfile
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/msimobsenutility/-/msimobsenutility-1.0.0.tgz"
+  integrity sha512-abcdefg1234567890abcdefg1234567890abcdefg1234567890abcdefg1234567890==
