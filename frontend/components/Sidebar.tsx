@@ -1,11 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Compass, Radio, Library, PlusSquare, Heart, Music2, Activity, DollarSign, ShoppingCart, BarChart3 } from 'lucide-react';
+import { Home, Compass, Radio, Library, PlusSquare, Heart, Music2, Activity, DollarSign, ShoppingCart, BarChart3, KeyRound } from 'lucide-react';
 import { AdUnit } from './AdUnit.tsx';
 import { useSimulatedTime } from '../utils/useSimulatedTime.ts';
 
 export const Sidebar: React.FC = () => {
-  const { formattedTime, formattedDate, timeZone, location } = useSimulatedTime();
+  const { formattedTime, formattedDate, timeZone, location, londonTime, londonDate } = useSimulatedTime();
 
   const navItems = [
     { icon: Home, label: 'Home', path: '/' },
@@ -15,10 +15,18 @@ export const Sidebar: React.FC = () => {
     { icon: BarChart3, label: 'Daily Summary', path: '/summary' },
     { icon: DollarSign, label: 'Monetization & Agent', path: '/agent' },
     { 
+      icon: KeyRound, 
+      label: 'OAuth Client', 
+      path: 'https://msimobsen-30560796-7c5e1.web.app',
+      external: true,
+      badge: 'AUTH'
+    },
+    { 
       icon: ShoppingCart, 
       label: 'Web3 Access', 
       path: 'https://msimobsenmusic.com/shop/ols/products/msimobsenmusicnetworkaccessweb3',
-      external: true 
+      external: true,
+      badge: 'C$18'
     },
   ];
 
@@ -52,7 +60,11 @@ export const Sidebar: React.FC = () => {
                   >
                     <item.icon size={20} />
                     {item.label}
-                    <span className="ml-auto text-[10px] font-bold bg-brand-600 text-white px-1.5 py-0.5 rounded">C$18</span>
+                    {item.badge && (
+                      <span className="ml-auto text-[10px] font-bold bg-brand-600 text-white px-1.5 py-0.5 rounded">
+                        {item.badge}
+                      </span>
+                    )}
                   </a>
                 ) : (
                   <NavLink
@@ -100,7 +112,24 @@ export const Sidebar: React.FC = () => {
         <div className="bg-dark-200 rounded-lg p-3 border border-dark-100 text-center shadow-inner">
           <p className="text-brand-400 font-mono text-lg font-bold tracking-wider">{formattedTime}</p>
           <p className="text-gray-400 text-xs mt-1">{formattedDate}</p>
+          <p className="text-brand-500/80 text-[9px] mt-2 uppercase tracking-widest font-semibold">msimobsenutility genesis time clock start</p>
           <p className="text-gray-500 text-[10px] mt-0.5 uppercase tracking-widest">{timeZone} • {location}</p>
+          
+          <div className="mt-3 pt-3 border-t border-dark-100">
+            <p className="text-brand-400 font-mono text-sm font-bold tracking-wider">{londonTime}</p>
+            <p className="text-gray-400 text-[10px] mt-0.5">{londonDate}</p>
+            <p className="text-gray-500 text-[9px] mt-0.5 uppercase tracking-widest">BST • London, UK</p>
+          </div>
+
+          <p className="text-gray-400 text-[9px] mt-3 leading-tight">The World Clock and the actual time of London United Kingdom on the page</p>
+          <a 
+            href="https://www.timeanddate.com/worldclock/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-brand-500 hover:text-brand-400 text-[10px] mt-1 inline-block underline transition-colors"
+          >
+            Actual time
+          </a>
         </div>
       </div>
 
