@@ -76,8 +76,3 @@ has-flag@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npmjs.org/has-flag/-/has-flag-4.0.0.tgz"
   integrity sha512-EykJT/Q1KjTWctWgxJ5duH0gKF1os9nqvygEk5remoXFm+2olxZ5QSJqCEhl9SI+9mbNnnYx2V5g5Z6ke1x9zw==
-
-msimobsenutility@latest:
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/msimobsenutility/-/msimobsenutility-1.0.0.tgz"
-  integrity sha512-abcdefg1234567890abcdefg1234567890abcdefg1234567890abcdefg1234567890==

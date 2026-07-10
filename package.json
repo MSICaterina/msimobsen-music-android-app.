@@ -1,6 +1,6 @@
 {
   "name": "msimobsen-music",
-  "workspaces": ["frontend", "backend"], 
+  "workspaces": ["frontend", "backend", "msimobsenutility"], 
   "scripts": {
     "dev-frontend": "npm run dev --prefix frontend",
     "dev-backend": "npm run dev --prefix backend",
@@ -9,6 +9,6 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
-    "msimobsenutility": "latest"
+    "msimobsenutility": "file:./msimobsenutility"
   }
 }

@@ -1,0 +1,12 @@
+{
+  "name": "msimobsenutility",
+  "version": "1.0.0",
+  "description": "MSI Mobsen utility package",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": ["msimobsen", "utility"],
+  "author": "MSICaterina",
+  "license": "MIT"
+}
