@@ -113,7 +113,7 @@
           headers: {
             'Content-Type': 'application/json',
             // Add a random header to identify these proxied requests on the Node.js backend.
-            'X-App-Proxy': 'TbwAhFcgDfj-TS-HP4f5F0lZ3l3Q1Cp9',
+            'X-App-Proxy': 'mWAY733FlcQU4_I5q3B1ktRsFWDEZW2B',
           },
           body: JSON.stringify(requestDetails),
         };
