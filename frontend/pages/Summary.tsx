@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { TrendingUp, DollarSign, Cpu, Users, ArrowUpRight, Calendar, ChevronDown, CheckCircle2, Loader2, CreditCard } from 'lucide-react';
+import { TrendingUp, DollarSign, Cpu, Users, ArrowUpRight, Calendar, ChevronDown, CheckCircle2, Loader2, CreditCard, History } from 'lucide-react';
 import { AdUnit } from '../components/AdUnit.tsx';
 
 const growthRates = {
@@ -15,6 +15,14 @@ const formatNumber = (num: number) => {
   return num.toString();
 };
 
+interface PayoutRecord {
+  id: string;
+  date: string;
+  amount: number;
+  merchantId: string;
+  status: 'Success' | 'Failed';
+}
+
 export const Summary: React.FC = () => {
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'year'>('week');
   
@@ -22,9 +30,29 @@ export const Summary: React.FC = () => {
   const [isPayingOut, setIsPayingOut] = useState(false);
   const [payoutMessage, setPayoutMessage] = useState<string | null>(null);
   const [payoutStatus, setPayoutStatus] = useState<string>('');
+  const [showHistory, setShowHistory] = useState(false);
   
-  // Use actual current timestamp
+  // Use actual current timestamp (datetime.now() equivalent)
   const [initialTimestamp] = useState(Date.now());
+  
+  // Mock Payout History updated with relative actual datetimes
+  const [payoutHistory, setPayoutHistory] = useState<PayoutRecord[]>([
+    { 
+      id: 'mock-2', 
+      date: new Date(initialTimestamp - 86400000 * 7).toLocaleString('en-US', { timeZone: 'America/Toronto' }), 
+      amount: 5120.50, 
+      merchantId: 'BCR2DN6D7KB2RK3J', 
+      status: 'Success' 
+    },
+    { 
+      id: 'mock-1', 
+      date: new Date(initialTimestamp - 86400000 * 30).toLocaleString('en-US', { timeZone: 'America/Toronto' }), 
+      amount: 4250.00, 
+      merchantId: 'BCR2DN6D7KB2RK3J', 
+      status: 'Success' 
+    },
+  ]);
+  
   const formattedDate = new Date(initialTimestamp).toLocaleDateString('en-US', { timeZone: 'America/Toronto', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   // Dynamically generate data ending on the current actual Toronto date
@@ -136,6 +164,16 @@ export const Summary: React.FC = () => {
     setIsPayingOut(false);
     setPayoutMessage(`Successfully initiated developer payout of $${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} to MSI Mobsen Mobile Social Internet Inc (Merchant ID: BCR2DN6D7KB2RK3J) via Google Pay.`);
     
+    // Add to history with actual datetime.now()
+    const newRecord: PayoutRecord = {
+      id: Date.now().toString(),
+      date: new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }),
+      amount: totalRevenue,
+      merchantId: 'BCR2DN6D7KB2RK3J',
+      status: 'Success'
+    };
+    setPayoutHistory(prev => [newRecord, ...prev]);
+
     // Hide message after 8 seconds
     setTimeout(() => {
       setPayoutMessage(null);
@@ -154,15 +192,24 @@ export const Summary: React.FC = () => {
         </div>
         
         <div className="flex flex-col sm:flex-row items-start gap-4">
-          <div className="flex flex-col gap-1.5">
-            <button
-              onClick={handleGooglePayPayout}
-              disabled={isPayingOut}
-              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:bg-dark-100 disabled:text-gray-500 text-white px-4 py-2.5 rounded-lg font-semibold transition-colors shadow-lg shadow-blue-900/20 w-full sm:w-auto"
-            >
-              {isPayingOut ? <Loader2 size={16} className="animate-spin" /> : <CreditCard size={16} />}
-              {isPayingOut ? 'Processing...' : 'GPay Payout'}
-            </button>
+          <div className="flex flex-col gap-1.5 relative">
+            <div className="flex gap-2 w-full sm:w-auto">
+              <button
+                onClick={handleGooglePayPayout}
+                disabled={isPayingOut}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:bg-dark-100 disabled:text-gray-500 text-white px-4 py-2.5 rounded-lg font-semibold transition-colors shadow-lg shadow-blue-900/20"
+              >
+                {isPayingOut ? <Loader2 size={16} className="animate-spin" /> : <CreditCard size={16} />}
+                {isPayingOut ? 'Processing...' : 'GPay Payout'}
+              </button>
+              <button
+                onClick={() => setShowHistory(!showHistory)}
+                className={`flex items-center justify-center px-3 rounded-lg border transition-colors ${showHistory ? 'bg-dark-100 border-brand-500 text-brand-400' : 'bg-dark-200 border-dark-100 hover:bg-dark-100 text-gray-400'}`}
+                title="View Payout History"
+              >
+                <History size={18} />
+              </button>
+            </div>
             <div className="text-[10px] text-gray-500 leading-tight text-center sm:text-left">
               MSI Mobsen Mobile Social Internet Inc<br/>
               Merchant ID: BCR2DN6D7KB2RK3J
@@ -171,6 +218,38 @@ export const Summary: React.FC = () => {
             {payoutStatus && (
               <div className="text-xs font-mono text-blue-400 mt-1 max-w-xs animate-fade-in">
                 Status: {payoutStatus}
+              </div>
+            )}
+
+            {/* Payout History Dropdown */}
+            {showHistory && (
+              <div className="absolute top-full left-0 mt-2 w-80 bg-dark-200 border border-dark-100 rounded-xl shadow-2xl z-50 overflow-hidden animate-fade-in">
+                <div className="p-3 border-b border-dark-100 bg-dark-300 flex justify-between items-center">
+                  <h4 className="text-white font-bold text-sm flex items-center gap-2">
+                    <History size={14} className="text-brand-400" /> Payout History
+                  </h4>
+                  <span className="text-xs text-gray-400">{payoutHistory.length} records</span>
+                </div>
+                <div className="max-h-64 overflow-y-auto p-2 space-y-2">
+                  {payoutHistory.map(record => (
+                    <div key={record.id} className="bg-dark-300 p-3 rounded-lg border border-dark-100 text-xs flex flex-col gap-1.5 hover:border-dark-50 transition-colors">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400 font-medium">{record.date}</span>
+                        <span className={`font-bold flex items-center gap-1 ${record.status === 'Success' ? 'text-emerald-400' : 'text-red-400'}`}>
+                          {record.status === 'Success' ? <CheckCircle2 size={12} /> : null}
+                          {record.status}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-end mt-1">
+                        <div className="flex flex-col">
+                          <span className="text-gray-500 text-[9px] uppercase tracking-wider">Merchant ID</span>
+                          <span className="text-gray-300 font-mono text-[10px]">{record.merchantId}</span>
+                        </div>
+                        <span className="text-white font-bold text-sm">${record.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
