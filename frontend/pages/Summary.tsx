@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { TrendingUp, DollarSign, Cpu, Users, ArrowUpRight, Calendar, ChevronDown, Send, CheckCircle2, Loader2 } from 'lucide-react';
+import { TrendingUp, DollarSign, Cpu, Users, ArrowUpRight, Calendar, ChevronDown, CheckCircle2, Loader2, CreditCard } from 'lucide-react';
 import { AdUnit } from '../components/AdUnit.tsx';
 
 const growthRates = {
@@ -17,8 +17,11 @@ const formatNumber = (num: number) => {
 
 export const Summary: React.FC = () => {
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'year'>('week');
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [syncMessage, setSyncMessage] = useState<string | null>(null);
+  
+  // Google Pay Payout State
+  const [isPayingOut, setIsPayingOut] = useState(false);
+  const [payoutMessage, setPayoutMessage] = useState<string | null>(null);
+  const [payoutStatus, setPayoutStatus] = useState<string>('');
   
   // Use actual current timestamp
   const [initialTimestamp] = useState(Date.now());
@@ -109,25 +112,40 @@ export const Summary: React.FC = () => {
     }
   ];
 
-  const handleSyncAdSense = () => {
-    setIsSyncing(true);
-    setSyncMessage(null);
+  const handleGooglePayPayout = async () => {
+    setIsPayingOut(true);
+    setPayoutMessage(null);
+    setPayoutStatus('Initializing Google Pay client...');
     
-    // Simulate API call to AdSense
+    // Simulate the INITIALIZE callback
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setPayoutStatus('onPaymentDataChanged(IntermediatePaymentData): INITIALIZE');
+
+    // Simulate user changing accounts (triggering INITIALIZE again)
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setPayoutStatus('Account changed. onPaymentDataChanged: Re-INITIALIZE');
+
+    // Simulate resolving PaymentDataRequestUpdate
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setPayoutStatus('Resolving Promise<PaymentDataRequestUpdate>...');
+
+    // Simulate final processing
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setPayoutStatus('Conclusion: Payment was completed successfully.');
+    
+    setIsPayingOut(false);
+    setPayoutMessage(`Successfully initiated developer payout of $${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} to MSI Mobsen Mobile Social Internet Inc (Merchant ID: BCR2DN6D7KB2RK3J) via Google Pay.`);
+    
+    // Hide message after 8 seconds
     setTimeout(() => {
-      setIsSyncing(false);
-      setSyncMessage(`Successfully sent ${timeframe} revenue summary ($${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}) to AdSense pub-9501043041040319 (MSI Mobsen Mobile Social Internet Inc).`);
-      
-      // Hide message after 5 seconds
-      setTimeout(() => {
-        setSyncMessage(null);
-      }, 5000);
-    }, 2000);
+      setPayoutMessage(null);
+      setPayoutStatus('');
+    }, 8000);
   };
 
   return (
     <div className="p-6 pb-24 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+      <div className="flex flex-col md:flex-row md:items-start justify-between mb-6 gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-4xl font-extrabold text-white">Traffic & Revenue Summary</h1>
@@ -135,38 +153,50 @@ export const Summary: React.FC = () => {
           <p className="text-gray-400">Overview of your platform's performance as of {formattedDate} (Toronto Time).</p>
         </div>
         
-        <div className="flex flex-col sm:flex-row items-center gap-4">
-          <button
-            onClick={handleSyncAdSense}
-            disabled={isSyncing}
-            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-dark-100 disabled:text-gray-500 text-white px-4 py-2 rounded-lg font-semibold transition-colors shadow-lg shadow-emerald-900/20"
-          >
-            {isSyncing ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-            {isSyncing ? 'Syncing to AdSense...' : 'Send to AdSense'}
-          </button>
+        <div className="flex flex-col sm:flex-row items-start gap-4">
+          <div className="flex flex-col gap-1.5">
+            <button
+              onClick={handleGooglePayPayout}
+              disabled={isPayingOut}
+              className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:bg-dark-100 disabled:text-gray-500 text-white px-4 py-2.5 rounded-lg font-semibold transition-colors shadow-lg shadow-blue-900/20 w-full sm:w-auto"
+            >
+              {isPayingOut ? <Loader2 size={16} className="animate-spin" /> : <CreditCard size={16} />}
+              {isPayingOut ? 'Processing...' : 'GPay Payout'}
+            </button>
+            <div className="text-[10px] text-gray-500 leading-tight text-center sm:text-left">
+              MSI Mobsen Mobile Social Internet Inc<br/>
+              Merchant ID: BCR2DN6D7KB2RK3J
+            </div>
+            {/* GPay Payout status summary line */}
+            {payoutStatus && (
+              <div className="text-xs font-mono text-blue-400 mt-1 max-w-xs animate-fade-in">
+                Status: {payoutStatus}
+              </div>
+            )}
+          </div>
 
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <select
               value={timeframe}
               onChange={(e) => setTimeframe(e.target.value as 'week' | 'month' | 'year')}
-              className="appearance-none bg-dark-200 border border-dark-100 px-4 py-2 pr-10 rounded-lg text-sm text-white font-medium focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 cursor-pointer"
+              className="w-full appearance-none bg-dark-200 border border-dark-100 px-4 py-2.5 pr-10 rounded-lg text-sm text-white font-medium focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 cursor-pointer"
             >
               <option value="week">Last 7 Days</option>
               <option value="month">Last 30 Days</option>
               <option value="year">This Year (YTD)</option>
             </select>
-            <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <ChevronDown size={16} className="absolute right-3 top-[18px] text-gray-400 pointer-events-none" />
           </div>
         </div>
       </div>
 
-      {/* Sync Success Message */}
-      {syncMessage && (
-        <div className="mb-8 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-start gap-3 animate-fade-in">
-          <CheckCircle2 className="text-emerald-400 flex-shrink-0 mt-0.5" size={20} />
+      {/* Payout Success Message */}
+      {payoutMessage && (
+        <div className="mb-8 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl flex items-start gap-3 animate-fade-in">
+          <CheckCircle2 className="text-blue-400 flex-shrink-0 mt-0.5" size={20} />
           <div>
-            <h4 className="text-emerald-400 font-bold text-sm">Sync Complete</h4>
-            <p className="text-emerald-200/80 text-sm mt-1">{syncMessage}</p>
+            <h4 className="text-blue-400 font-bold text-sm">Payout Initiated</h4>
+            <p className="text-blue-200/80 text-sm mt-1">{payoutMessage}</p>
           </div>
         </div>
       )}
