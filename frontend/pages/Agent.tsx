@@ -203,7 +203,7 @@ export const Agent: React.FC = () => {
                   <h2 className="text-2xl font-bold text-white">AdSense Revenue</h2>
                   <div className="flex items-center gap-2 text-sm text-gray-400 mt-1">
                     <ShieldCheck size={14} className="text-emerald-500" />
-                    <span>Publisher ID: <strong className="text-gray-200">pub-9501043041040319</strong></span>
+                    <span>Publisher ID: <strong className="text-gray-200">pub-••••••••••••••••</strong></span>
                   </div>
                 </div>
               </div>
@@ -388,6 +388,26 @@ export const Agent: React.FC = () => {
                 <p className="text-xs text-gray-500 mt-3 ml-8 leading-relaxed">
                   Enabling <strong className="text-gray-300">MCP (Model Context Protocol)</strong> allows the agent to securely interface with your local environment, external AI models, and real-time traffic analytics to optimize ad placements dynamically.
                 </p>
+              </div>
+
+              <div>
+                <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
+                  <span className="bg-dark-100 text-gray-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">4</span>
+                  Configure IAM Permissions
+                </h3>
+                <div className="bg-dark-300 rounded-lg p-4 border border-dark-100 text-sm text-gray-300 leading-relaxed">
+                  <p className="mb-2">
+                    To allow the agent to execute tools via the Model Context Protocol, your Google Cloud principal must have the <code className="text-brand-400 bg-dark-100 px-1.5 py-0.5 rounded">mcp.tools.call</code> permission.
+                  </p>
+                  <a 
+                    href="https://docs.cloud.google.com/iam/docs/roles-permissions/mcp#mcp.tools.call" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-brand-500 hover:text-brand-400 inline-flex items-center gap-1 font-medium transition-colors"
+                  >
+                    View IAM Documentation <ExternalLink size={14} />
+                  </a>
+                </div>
               </div>
             </div>
           </div>
