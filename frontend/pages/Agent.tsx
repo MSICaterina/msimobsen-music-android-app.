@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Cpu, Terminal, Copy, CheckCircle2, Package, KeyRound, DollarSign, Wallet, ArrowRight, ShieldCheck, TrendingUp, Settings, Zap, RefreshCw, Coins, Server, ExternalLink, Link as LinkIcon, Bot, Send } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { AdUnit } from '../components/AdUnit.tsx';
-import { useSimulatedTime, getGlobalSimulatedTime } from '../utils/useSimulatedTime.ts';
 
 declare const process: { env: { API_KEY: string } };
 
@@ -24,7 +23,7 @@ const MOCK_LOGS = [
 ];
 
 export const Agent: React.FC = () => {
-  const { formattedDate } = useSimulatedTime();
+  const formattedDate = new Date().toLocaleDateString('en-US', { timeZone: 'America/Toronto', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   // Agent Token State
   const [token, setToken] = useState<string | null>(null);
@@ -48,7 +47,7 @@ export const Agent: React.FC = () => {
 
   // Agent Logs State
   const [logs, setLogs] = useState<string[]>([
-    `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Agent initialized. Monitoring traffic...`
+    `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Agent initialized. Monitoring traffic...`
   ]);
 
   // AI Chat State
@@ -62,7 +61,7 @@ export const Agent: React.FC = () => {
     const interval = setInterval(() => {
       const newLog = MOCK_LOGS[Math.floor(Math.random() * MOCK_LOGS.length)];
       setLogs(prev => {
-        const updated = [...prev, `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] ${newLog}`];
+        const updated = [...prev, `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] ${newLog}`];
         return updated.slice(-6); // Keep last 6 logs
       });
     }, 3500);
@@ -97,11 +96,11 @@ export const Agent: React.FC = () => {
             .then(res => res.json())
             .then(data => {
                setAuthUser(data);
-               setLogs(prev => [...prev.slice(-5), `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] OAuth Login successful for ${data.email}`]);
+               setLogs(prev => [...prev.slice(-5), `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] OAuth Login successful for ${data.email}`]);
             })
             .catch(err => {
               console.error("Error fetching user info:", err);
-              setLogs(prev => [...prev.slice(-5), `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] OAuth Error: Failed to fetch user profile.`]);
+              setLogs(prev => [...prev.slice(-5), `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] OAuth Error: Failed to fetch user profile.`]);
             });
           }
         },
@@ -109,7 +108,7 @@ export const Agent: React.FC = () => {
       client.requestAccessToken();
     } else {
       console.error("Google Identity Services script not loaded.");
-      setLogs(prev => [...prev.slice(-5), `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Error: Google Identity Services not loaded.`]);
+      setLogs(prev => [...prev.slice(-5), `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Error: Google Identity Services not loaded.`]);
     }
   };
 
@@ -117,7 +116,7 @@ export const Agent: React.FC = () => {
     const newRevenue = Math.random() * 3 + 0.5;
     setBalance(prev => prev + newRevenue);
     setPayoutMessage(null);
-    setLogs(prev => [...prev.slice(-5), `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Manual revenue simulation triggered: +$${newRevenue.toFixed(2)}`]);
+    setLogs(prev => [...prev.slice(-5), `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Manual revenue simulation triggered: +$${newRevenue.toFixed(2)}`]);
   };
 
   const handlePayout = (method: 'bank' | 'web3') => {
@@ -127,7 +126,7 @@ export const Agent: React.FC = () => {
         setBalance(0);
         setIsWithdrawing(false);
         setPayoutMessage(`Success! Funds have been transferred to your connected ${method === 'bank' ? 'bank account' : 'Web3 wallet'}.`);
-        setLogs(prev => [...prev.slice(-5), `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Payout executed via ${method.toUpperCase()}. Balance reset.`]);
+        setLogs(prev => [...prev.slice(-5), `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Payout executed via ${method.toUpperCase()}. Balance reset.`]);
       }, 2000);
     }
   };
@@ -203,7 +202,7 @@ export const Agent: React.FC = () => {
                   <h2 className="text-2xl font-bold text-white">AdSense Revenue</h2>
                   <div className="flex items-center gap-2 text-sm text-gray-400 mt-1">
                     <ShieldCheck size={14} className="text-emerald-500" />
-                    <span>Publisher ID: <strong className="text-gray-200">pub-••••••••••••••••</strong></span>
+                    <span>Publisher ID: <strong className="text-gray-200">pub-9501043041040319</strong></span>
                   </div>
                 </div>
               </div>
