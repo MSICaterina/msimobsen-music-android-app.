@@ -2,8 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Cpu, Terminal, Copy, CheckCircle2, Package, KeyRound, DollarSign, Wallet, ArrowRight, ShieldCheck, TrendingUp, Settings, Zap, RefreshCw, Coins, Server, ExternalLink, Link as LinkIcon, Bot, Send } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { AdUnit } from '../components/AdUnit.tsx';
+import { useSimulatedTime, getGlobalSimulatedTime } from '../utils/useSimulatedTime.ts';
 
 declare const process: { env: { API_KEY: string } };
+
+declare global {
+  interface Window {
+    google?: any;
+  }
+}
 
 const MOCK_LOGS = [
   "Optimizing ad slot pub-••••••••••••...",
@@ -17,12 +24,15 @@ const MOCK_LOGS = [
 ];
 
 export const Agent: React.FC = () => {
-  const formattedDate = new Date().toLocaleDateString('en-US', { timeZone: 'America/Toronto', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const { formattedDate } = useSimulatedTime();
 
   // Agent Token State
   const [token, setToken] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+
+  // OAuth State
+  const [authUser, setAuthUser] = useState<any>(null);
 
   // AdSense Revenue State
   const [balance, setBalance] = useState(84.50);
@@ -38,7 +48,7 @@ export const Agent: React.FC = () => {
 
   // Agent Logs State
   const [logs, setLogs] = useState<string[]>([
-    `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Agent initialized. Monitoring traffic...`
+    `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Agent initialized. Monitoring traffic...`
   ]);
 
   // AI Chat State
@@ -52,7 +62,7 @@ export const Agent: React.FC = () => {
     const interval = setInterval(() => {
       const newLog = MOCK_LOGS[Math.floor(Math.random() * MOCK_LOGS.length)];
       setLogs(prev => {
-        const updated = [...prev, `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] ${newLog}`];
+        const updated = [...prev, `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] ${newLog}`];
         return updated.slice(-6); // Keep last 6 logs
       });
     }, 3500);
@@ -74,11 +84,40 @@ export const Agent: React.FC = () => {
     }
   };
 
+  const handleOAuthLogin = () => {
+    if (window.google) {
+      const client = window.google.accounts.oauth2.initTokenClient({
+        client_id: '762658008656-53ncm67h1bfr6464s2t42pnnp3o94uj8.apps.googleusercontent.com',
+        scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+        callback: (tokenResponse: any) => {
+          if (tokenResponse && tokenResponse.access_token) {
+            fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+              headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+            })
+            .then(res => res.json())
+            .then(data => {
+               setAuthUser(data);
+               setLogs(prev => [...prev.slice(-5), `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] OAuth Login successful for ${data.email}`]);
+            })
+            .catch(err => {
+              console.error("Error fetching user info:", err);
+              setLogs(prev => [...prev.slice(-5), `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] OAuth Error: Failed to fetch user profile.`]);
+            });
+          }
+        },
+      });
+      client.requestAccessToken();
+    } else {
+      console.error("Google Identity Services script not loaded.");
+      setLogs(prev => [...prev.slice(-5), `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Error: Google Identity Services not loaded.`]);
+    }
+  };
+
   const simulateAdRevenue = () => {
     const newRevenue = Math.random() * 3 + 0.5;
     setBalance(prev => prev + newRevenue);
     setPayoutMessage(null);
-    setLogs(prev => [...prev.slice(-5), `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Manual revenue simulation triggered: +$${newRevenue.toFixed(2)}`]);
+    setLogs(prev => [...prev.slice(-5), `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Manual revenue simulation triggered: +$${newRevenue.toFixed(2)}`]);
   };
 
   const handlePayout = (method: 'bank' | 'web3') => {
@@ -88,7 +127,7 @@ export const Agent: React.FC = () => {
         setBalance(0);
         setIsWithdrawing(false);
         setPayoutMessage(`Success! Funds have been transferred to your connected ${method === 'bank' ? 'bank account' : 'Web3 wallet'}.`);
-        setLogs(prev => [...prev.slice(-5), `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Payout executed via ${method.toUpperCase()}. Balance reset.`]);
+        setLogs(prev => [...prev.slice(-5), `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Payout executed via ${method.toUpperCase()}. Balance reset.`]);
       }, 2000);
     }
   };
@@ -164,7 +203,7 @@ export const Agent: React.FC = () => {
                   <h2 className="text-2xl font-bold text-white">AdSense Revenue</h2>
                   <div className="flex items-center gap-2 text-sm text-gray-400 mt-1">
                     <ShieldCheck size={14} className="text-emerald-500" />
-                    <span>Publisher ID: <strong className="text-gray-200">pub-••••••••••••••••</strong></span>
+                    <span>Publisher ID: <strong className="text-gray-200">pub-9501043041040319</strong></span>
                   </div>
                 </div>
               </div>
@@ -353,6 +392,96 @@ export const Agent: React.FC = () => {
             </div>
           </div>
 
+          {/* Python SDK Integration Card */}
+          <div className="bg-dark-200 rounded-2xl p-8 border border-dark-100 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
+              <Terminal size={120} />
+            </div>
+            
+            <div className="flex items-center gap-4 mb-6">
+              <div className="bg-blue-500 p-3 rounded-xl">
+                <Terminal size={24} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white">Python SDK Integration</h2>
+                <p className="text-sm text-gray-400">Example of fetching AdSense data and analyzing it with the Google GenAI Python SDK.</p>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
+                  <span className="bg-dark-100 text-gray-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                  Install Dependencies
+                </h3>
+                <div className="bg-dark-300 rounded-lg p-4 border border-dark-100 flex items-center gap-3 font-mono text-sm overflow-x-auto">
+                  <Terminal size={16} className="text-gray-500 flex-shrink-0" />
+                  <span className="text-gray-300 whitespace-nowrap">pip install --upgrade google-api-python-client google-auth-oauthlib google-genai</span>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
+                  <span className="bg-dark-100 text-gray-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                  AdSense + Gemini Optimization Script
+                </h3>
+                <div className="bg-dark-300 rounded-lg p-4 border border-dark-100 font-mono text-sm overflow-x-auto text-gray-300">
+                  <pre className="whitespace-pre-wrap">
+{`import os
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google import genai
+
+# 1. AUTHENTICATE GOOGLE ADSENSE
+SCOPES = ['https://www.googleapis.com/auth/adsense.readonly']
+flow = InstalledAppFlow.from_client_secrets_file('client_secrets.json', SCOPES)
+credentials = flow.run_local_server(port=0)
+adsense = build('adsense', 'v2', credentials=credentials)
+
+# 2. FETCH ADSENSE REPORT DATA
+# Retrieves data grouped by Ad Unit looking at Impressions, Clicks, and Estimated Earnings
+account_id = 'accounts/pub-9501043041040319' # Explicitly set Publisher ID
+
+report = adsense.accounts().reports().generate(
+  account=account_id,
+  dateRange='LAST_30_DAYS',
+  metrics=['IMPRESSIONS', 'CLICKS', 'ESTIMATED_EARNINGS'],
+  dimensions=['AD_UNIT_NAME']
+).execute()
+
+# Format the rows of data for our GenAI prompt
+report_rows = report.get('rows', [])
+formatted_data = "\\n".join([f"Ad Unit: {r['cells'][0]['value']} | Impressions: {r['cells'][1]['value']} | Clicks: {r['cells'][2]['value']} | Earnings: \${r['cells'][3]['value']}" for r in report_rows])
+
+# 3. INITIALIZE GEMINI CLIENT AND ANALYZE
+# Ensure your GEMINI_API_KEY environment variable is set
+client = genai.Client()
+
+prompt = f"""
+You are an expert ad optimization AI. Analyze the following 30-day Google AdSense performance data and suggest actionable ways to maximize revenue:
+
+{formatted_data}
+
+Provide:
+1. Top performing ad units.
+2. Underperforming ad units with a low Click-Through Rate (CTR).
+3. Strategy adjustments (e.g., placement changes, unit size adjustments).
+"""
+
+# Call Gemini model to process the data
+interaction = client.models.generate_content(
+  model="gemini-2.5-flash",
+  contents=prompt
+)
+
+print("\\n--- GenAI Optimization Recommendations ---")
+print(interaction.text)`}
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Agent Automation Settings */}
           <div className="bg-dark-200 rounded-2xl p-8 border border-dark-100">
             <div className="flex items-center gap-4 mb-6">
@@ -459,15 +588,22 @@ export const Agent: React.FC = () => {
                 <Cpu size={20} />
                 {token ? 'Regenerate Token' : 'Generate Workflow Token'}
               </button>
-              <a 
-                href="https://msimobsen-30560796-7c5e1.web.app"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 bg-dark-100 hover:bg-dark-50 text-white font-bold py-3 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 border border-dark-50"
-              >
-                <KeyRound size={20} className="text-brand-400" />
-                OAuth Client Login
-              </a>
+              
+              {authUser ? (
+                <div className="flex-1 bg-dark-100 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 border border-emerald-500/30">
+                  <img src={authUser.picture} alt="Profile" className="w-6 h-6 rounded-full" />
+                  <span className="truncate">{authUser.name}</span>
+                  <CheckCircle2 size={16} className="text-emerald-400 ml-1" />
+                </div>
+              ) : (
+                <button 
+                  onClick={handleOAuthLogin}
+                  className="flex-1 bg-dark-100 hover:bg-dark-50 text-white font-bold py-3 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 border border-dark-50"
+                >
+                  <KeyRound size={20} className="text-brand-400" />
+                  OAuth Client Login
+                </button>
+              )}
             </div>
           </div>
 
