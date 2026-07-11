@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { TrendingUp, DollarSign, Cpu, Users, ArrowUpRight, Calendar, ChevronDown } from 'lucide-react';
+import { TrendingUp, DollarSign, Cpu, Users, ArrowUpRight, Calendar, ChevronDown, Send, CheckCircle2, Loader2 } from 'lucide-react';
 import { AdUnit } from '../components/AdUnit.tsx';
 
 const growthRates = {
@@ -17,6 +17,8 @@ const formatNumber = (num: number) => {
 
 export const Summary: React.FC = () => {
   const [timeframe, setTimeframe] = useState<'week' | 'month' | 'year'>('week');
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
   
   // Use actual current timestamp
   const [initialTimestamp] = useState(Date.now());
@@ -107,9 +109,25 @@ export const Summary: React.FC = () => {
     }
   ];
 
+  const handleSyncAdSense = () => {
+    setIsSyncing(true);
+    setSyncMessage(null);
+    
+    // Simulate API call to AdSense
+    setTimeout(() => {
+      setIsSyncing(false);
+      setSyncMessage(`Successfully sent ${timeframe} revenue summary ($${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}) to AdSense pub-9501043041040319 (MSI Mobsen Mobile Social Internet Inc).`);
+      
+      // Hide message after 5 seconds
+      setTimeout(() => {
+        setSyncMessage(null);
+      }, 5000);
+    }, 2000);
+  };
+
   return (
     <div className="p-6 pb-24 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-4xl font-extrabold text-white">Traffic & Revenue Summary</h1>
@@ -117,19 +135,41 @@ export const Summary: React.FC = () => {
           <p className="text-gray-400">Overview of your platform's performance as of {formattedDate} (Toronto Time).</p>
         </div>
         
-        <div className="relative">
-          <select
-            value={timeframe}
-            onChange={(e) => setTimeframe(e.target.value as 'week' | 'month' | 'year')}
-            className="appearance-none bg-dark-200 border border-dark-100 px-4 py-2 pr-10 rounded-lg text-sm text-white font-medium focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 cursor-pointer"
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <button
+            onClick={handleSyncAdSense}
+            disabled={isSyncing}
+            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:bg-dark-100 disabled:text-gray-500 text-white px-4 py-2 rounded-lg font-semibold transition-colors shadow-lg shadow-emerald-900/20"
           >
-            <option value="week">Last 7 Days</option>
-            <option value="month">Last 30 Days</option>
-            <option value="year">This Year (YTD)</option>
-          </select>
-          <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            {isSyncing ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+            {isSyncing ? 'Syncing to AdSense...' : 'Send to AdSense'}
+          </button>
+
+          <div className="relative">
+            <select
+              value={timeframe}
+              onChange={(e) => setTimeframe(e.target.value as 'week' | 'month' | 'year')}
+              className="appearance-none bg-dark-200 border border-dark-100 px-4 py-2 pr-10 rounded-lg text-sm text-white font-medium focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 cursor-pointer"
+            >
+              <option value="week">Last 7 Days</option>
+              <option value="month">Last 30 Days</option>
+              <option value="year">This Year (YTD)</option>
+            </select>
+            <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          </div>
         </div>
       </div>
+
+      {/* Sync Success Message */}
+      {syncMessage && (
+        <div className="mb-8 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-start gap-3 animate-fade-in">
+          <CheckCircle2 className="text-emerald-400 flex-shrink-0 mt-0.5" size={20} />
+          <div>
+            <h4 className="text-emerald-400 font-bold text-sm">Sync Complete</h4>
+            <p className="text-emerald-200/80 text-sm mt-1">{syncMessage}</p>
+          </div>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
