@@ -211,8 +211,10 @@ export const Summary: React.FC = () => {
               </button>
             </div>
             <div className="text-[10px] text-gray-500 leading-tight text-center sm:text-left">
-              MSI Mobsen Mobile Social Internet Inc<br/>
-              Merchant ID: BCR2DN6D7KB2RK3J
+              <a href="https://pay.google.com/business/console/info/BCR2DN6D7KB2RK3J" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">
+                MSI Mobsen Mobile Social Internet Inc<br/>
+                Merchant ID: BCR2DN6D7KB2RK3J
+              </a>
             </div>
             {/* GPay Payout status summary line */}
             {payoutStatus && (
