@@ -202,7 +202,7 @@ export const Agent: React.FC = () => {
                   <h2 className="text-2xl font-bold text-white">AdSense Revenue</h2>
                   <div className="flex items-center gap-2 text-sm text-gray-400 mt-1">
                     <ShieldCheck size={14} className="text-emerald-500" />
-                    <span>Publisher ID: <strong className="text-gray-200">pub-9501043041040319</strong></span>
+                    <span>Publisher ID: <strong className="text-gray-200">pub-••••••••••••••••</strong></span>
                   </div>
                 </div>
               </div>
@@ -406,6 +406,17 @@ export const Agent: React.FC = () => {
                   >
                     View IAM Documentation <ExternalLink size={14} />
                   </a>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
+                  <span className="bg-dark-100 text-gray-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">5</span>
+                  Enable Secret Manager API
+                </h3>
+                <div className="bg-dark-300 rounded-lg p-4 border border-dark-100 flex items-center gap-3 font-mono text-sm">
+                  <Terminal size={16} className="text-gray-500 flex-shrink-0" />
+                  <span className="text-gray-300 break-all">gcloud services enable secretmanager.googleapis.com</span>
                 </div>
               </div>
             </div>
