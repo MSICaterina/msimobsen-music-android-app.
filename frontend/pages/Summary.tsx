@@ -35,18 +35,11 @@ export const Summary: React.FC = () => {
   // Use actual current timestamp (datetime.now() equivalent)
   const [initialTimestamp] = useState(Date.now());
   
-  // Mock Payout History updated with relative actual datetimes
+  // Payout History starting fresh from July 11, 2026
   const [payoutHistory, setPayoutHistory] = useState<PayoutRecord[]>([
     { 
-      id: 'mock-2', 
-      date: new Date(initialTimestamp - 86400000 * 7).toLocaleString('en-US', { timeZone: 'America/Toronto' }), 
-      amount: 5120.50, 
-      merchantId: 'BCR2DN6D7KB2RK3J', 
-      status: 'Success' 
-    },
-    { 
       id: 'mock-1', 
-      date: new Date(initialTimestamp - 86400000 * 30).toLocaleString('en-US', { timeZone: 'America/Toronto' }), 
+      date: new Date('2026-07-11T10:00:00Z').toLocaleString('en-US', { timeZone: 'America/Toronto' }), 
       amount: 4250.00, 
       merchantId: 'BCR2DN6D7KB2RK3J', 
       status: 'Success' 
@@ -233,24 +226,28 @@ export const Summary: React.FC = () => {
                   <span className="text-xs text-gray-400">{payoutHistory.length} records</span>
                 </div>
                 <div className="max-h-64 overflow-y-auto p-2 space-y-2">
-                  {payoutHistory.map(record => (
-                    <div key={record.id} className="bg-dark-300 p-3 rounded-lg border border-dark-100 text-xs flex flex-col gap-1.5 hover:border-dark-50 transition-colors">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-400 font-medium">{record.date}</span>
-                        <span className={`font-bold flex items-center gap-1 ${record.status === 'Success' ? 'text-emerald-400' : 'text-red-400'}`}>
-                          {record.status === 'Success' ? <CheckCircle2 size={12} /> : null}
-                          {record.status}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-end mt-1">
-                        <div className="flex flex-col">
-                          <span className="text-gray-500 text-[9px] uppercase tracking-wider">Merchant ID</span>
-                          <span className="text-gray-300 font-mono text-[10px]">{record.merchantId}</span>
+                  {payoutHistory.length === 0 ? (
+                    <div className="text-center py-4 text-gray-500 text-xs">No payout history available.</div>
+                  ) : (
+                    payoutHistory.map(record => (
+                      <div key={record.id} className="bg-dark-300 p-3 rounded-lg border border-dark-100 text-xs flex flex-col gap-1.5 hover:border-dark-50 transition-colors">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-400 font-medium">{record.date}</span>
+                          <span className={`font-bold flex items-center gap-1 ${record.status === 'Success' ? 'text-emerald-400' : 'text-red-400'}`}>
+                            {record.status === 'Success' ? <CheckCircle2 size={12} /> : null}
+                            {record.status}
+                          </span>
                         </div>
-                        <span className="text-white font-bold text-sm">${record.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        <div className="flex justify-between items-end mt-1">
+                          <div className="flex flex-col">
+                            <span className="text-gray-500 text-[9px] uppercase tracking-wider">Merchant ID</span>
+                            <span className="text-gray-300 font-mono text-[10px]">{record.merchantId}</span>
+                          </div>
+                          <span className="text-white font-bold text-sm">${record.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
             )}
