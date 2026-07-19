@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Cpu, Terminal, Copy, CheckCircle2, Package, KeyRound, DollarSign, Wallet, ArrowRight, ShieldCheck, TrendingUp, Settings, Zap, RefreshCw, Coins, Server, ExternalLink, Link as LinkIcon, Bot, Send } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 import { AdUnit } from '../components/AdUnit.tsx';
+import { useSimulatedTime, getGlobalSimulatedTime } from '../utils/useSimulatedTime.ts';
 
 declare const process: { env: { API_KEY: string } };
 
@@ -23,7 +24,7 @@ const MOCK_LOGS = [
 ];
 
 export const Agent: React.FC = () => {
-  const formattedDate = new Date().toLocaleDateString('en-US', { timeZone: 'America/Toronto', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const { formattedDate } = useSimulatedTime();
 
   // Agent Token State
   const [token, setToken] = useState<string | null>(null);
@@ -47,7 +48,7 @@ export const Agent: React.FC = () => {
 
   // Agent Logs State
   const [logs, setLogs] = useState<string[]>([
-    `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Agent initialized. Monitoring traffic...`
+    `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Agent initialized. Monitoring traffic...`
   ]);
 
   // AI Chat State
@@ -61,7 +62,7 @@ export const Agent: React.FC = () => {
     const interval = setInterval(() => {
       const newLog = MOCK_LOGS[Math.floor(Math.random() * MOCK_LOGS.length)];
       setLogs(prev => {
-        const updated = [...prev, `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] ${newLog}`];
+        const updated = [...prev, `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] ${newLog}`];
         return updated.slice(-6); // Keep last 6 logs
       });
     }, 3500);
@@ -96,11 +97,11 @@ export const Agent: React.FC = () => {
             .then(res => res.json())
             .then(data => {
                setAuthUser(data);
-               setLogs(prev => [...prev.slice(-5), `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] OAuth Login successful for ${data.email}`]);
+               setLogs(prev => [...prev.slice(-5), `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] OAuth Login successful for ${data.email}`]);
             })
             .catch(err => {
               console.error("Error fetching user info:", err);
-              setLogs(prev => [...prev.slice(-5), `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] OAuth Error: Failed to fetch user profile.`]);
+              setLogs(prev => [...prev.slice(-5), `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] OAuth Error: Failed to fetch user profile.`]);
             });
           }
         },
@@ -108,7 +109,7 @@ export const Agent: React.FC = () => {
       client.requestAccessToken();
     } else {
       console.error("Google Identity Services script not loaded.");
-      setLogs(prev => [...prev.slice(-5), `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Error: Google Identity Services not loaded.`]);
+      setLogs(prev => [...prev.slice(-5), `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Error: Google Identity Services not loaded.`]);
     }
   };
 
@@ -116,7 +117,7 @@ export const Agent: React.FC = () => {
     const newRevenue = Math.random() * 3 + 0.5;
     setBalance(prev => prev + newRevenue);
     setPayoutMessage(null);
-    setLogs(prev => [...prev.slice(-5), `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Manual revenue simulation triggered: +$${newRevenue.toFixed(2)}`]);
+    setLogs(prev => [...prev.slice(-5), `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Manual revenue simulation triggered: +$${newRevenue.toFixed(2)}`]);
   };
 
   const handlePayout = (method: 'bank' | 'web3') => {
@@ -126,7 +127,7 @@ export const Agent: React.FC = () => {
         setBalance(0);
         setIsWithdrawing(false);
         setPayoutMessage(`Success! Funds have been transferred to your connected ${method === 'bank' ? 'bank account' : 'Web3 wallet'}.`);
-        setLogs(prev => [...prev.slice(-5), `[${new Date().toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Payout executed via ${method.toUpperCase()}. Balance reset.`]);
+        setLogs(prev => [...prev.slice(-5), `[${new Date(getGlobalSimulatedTime()).toLocaleTimeString('en-US', { timeZone: 'America/Toronto' })}] Payout executed via ${method.toUpperCase()}. Balance reset.`]);
       }, 2000);
     }
   };
@@ -446,7 +447,7 @@ export const Agent: React.FC = () => {
                 </h3>
                 <div className="bg-dark-300 rounded-lg p-4 border border-dark-100 flex items-center gap-3 font-mono text-sm overflow-x-auto">
                   <Terminal size={16} className="text-gray-500 flex-shrink-0" />
-                  <span className="text-gray-300 whitespace-nowrap">pip install --upgrade google-api-python-client google-auth-oauthlib google-genai</span>
+                  <span className="text-gray-300 whitespace-nowrap">pip install --upgrade google-api-python-client google-auth-oauthlib google-genai google-cloud-bigquery</span>
                 </div>
               </div>
 
@@ -506,6 +507,57 @@ interaction = client.models.generate_content(
 
 print("\\n--- GenAI Optimization Recommendations ---")
 print(interaction.text)`}
+                  </pre>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
+                  <span className="bg-dark-100 text-gray-400 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
+                  BigQuery Data Pipeline Script
+                </h3>
+                <div className="bg-dark-300 rounded-lg p-4 border border-dark-100 font-mono text-sm overflow-x-auto text-gray-300">
+                  <pre className="whitespace-pre-wrap">
+{`import os
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from google.cloud import bigquery
+
+# 1. Authenticate with Google AdSense
+SCOPES = ['https://www.googleapis.com/auth/adsense.readonly']
+creds = service_account.Credentials.from_service_account_file('service_account_key.json', scopes=SCOPES)
+adsense_client = build('adsense', 'v2', credentials=creds)
+
+def fetch_and_store_adsense_data():
+  # 2. Query AdSense Reports
+  # Get your AdSense account ID
+  accounts = adsense_client.accounts().list().execute()
+  account_id = accounts['accounts'][0]['name']
+   
+  # Generate the report for the last 30 days
+  report = adsense_client.accounts().reports().generate(
+    account=account_id,
+    dateRange='LAST_30_DAYS',
+    metrics=['IMPRESSIONS', 'CLICKS', 'ESTIMATED_EARNINGS'],
+    dimensions=['DATE']
+  ).execute()
+   
+  # 3. Stream data into BigQuery (ad_revenues)
+  bq_client = bigquery.Client()
+  table_id = "feisty-port-483522-q0.ad_revenues.daily_earnings"
+   
+  rows_to_insert = []
+  for row in report.get('rows', []):
+    rows_to_insert.append({
+      "date": row['cells'][0]['value'],
+      "impressions": int(row['cells'][1]['value']),
+      "clicks": int(row['cells'][2]['value']),
+      "earnings": float(row['cells'][3]['value'])
+    })
+     
+  errors = bq_client.insert_rows_json(table_id, rows_to_insert)
+  if errors == []:
+    print("AdSense data successfully saved to BigQuery!")`}
                   </pre>
                 </div>
               </div>
