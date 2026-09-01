@@ -135,7 +135,7 @@ function parsePattern(pattern) {
     params.push(match[1]);
     const literalPart = pattern.substring(lastIndex, match.index);
     parts.push(escapeRegex(literalPart));
-    parts.push(`(?<${match[1]}>[^/]+)`);
+    parts.push(`(?<${match[1]}>[A-Za-z0-9\-_.!~*'():@]+)`);
     lastIndex = paramRegex.lastIndex;
   }
   parts.push(escapeRegex(pattern.substring(lastIndex)));
@@ -144,14 +144,37 @@ function parsePattern(pattern) {
   return {regex: new RegExp(`^${regexString}$`), params};
 }
 
+function isSafePathSegment(value) {
+  return !!value && value !== '.' && value !== '..' && encodeURIComponent(value).replace(/%3A/g, ':').replace(/%40/g, '@') === value;
+}
+
 function extractParams(patternInfo, url) {
   const match = url.match(patternInfo.regex);
   if (!match) return null;
   const params = {};
-  patternInfo.params.forEach((paramName, index) => {
-    params[paramName] = match[index + 1];
-  });
+  for (let i = 0; i < patternInfo.params.length; i++) {
+    const value = match[i + 1];
+    if (!isSafePathSegment(value)) return null;
+    params[patternInfo.params[i]] = value;
+  }
   return params;
+}
+
+const FORWARDABLE_REQUEST_HEADERS = new Set([
+  "accept",
+  "accept-language",
+  "content-type",
+  "x-goog-api-client",
+]);
+
+function sanitizeForwardedHeaders(requestHeaders) {
+  const forwardable = {};
+  for (const [name, value] of Object.entries(requestHeaders || {})) {
+    if (FORWARDABLE_REQUEST_HEADERS.has(name.toLowerCase())) {
+      forwardable[name] = value;
+    }
+  }
+  return forwardable;
 }
 
 async function getAccessToken(res) {
@@ -190,7 +213,7 @@ app.post('/api-proxy', async (req, res) => {
     return res.status(403).send('Forbidden: Request must originate from the Vertex App shim.');
   }
 
-  const { originalUrl, method, headers, body } = req.body;
+  const { originalUrl, headers, body } = req.body;
   if (!originalUrl) {
     return res.status(400).send('Bad Request: originalUrl is required.');
   }
@@ -241,8 +264,8 @@ app.post('/api-proxy', async (req, res) => {
     const apiHeaders = getRequestHeaders(accessToken);
 
     const apiFetchOptions = {
-      method: method || 'POST',
-      headers: {...apiHeaders, ...headers},
+      method: 'POST',
+      headers: {...sanitizeForwardedHeaders(headers), ...apiHeaders},
       body: body ? body : undefined,
     };
 
